@@ -1,0 +1,338 @@
+Content:
+	
+1. Software Testing Overview
+2. Test Levels and Test Types
+3. Test Automation
+4. Integration Testing
+5. API Testing
+6. Web UI Test Automation
+
+
+=========================
+
+
+-------------------------
+Software Testing Overview
+-------------------------
+Finding Out How Well Something Works
+
+
+Software Testing
+
+▪ Testing is an important part of the application lifecycle
+	▪ New features need to be verified, before delivered to the clients
+▪ Testing covers a wide spectrum in application development
+	▪ There are several levels of testing, many concepts and different types of testing
+▪ Testing checks whether the developed software conforms to the software requirements (functional, non-functional, etc.)
+▪ Testing aims to find & report defects (bugs)
+
+
+Importance of Software Testing
+
+▪ Ensures quality
+	▪ Helps identify errors and defects
+▪ Reduces risks
+▪ Cost-Effective
+	▪ Detecting and fixing bugs in the early stages of development can save money in the long run
+▪ Ensures compliance to requirements and regulations
+▪ Facilitates improvement
+	▪ Provides continuous improvement in the software development process
+
+
+The Software Testing Process
+
+▪ Test planning
+	▪ What, when, how to test?
+▪ Test design
+	▪ Test scenarios & test cases
+▪ Setup test environment
+	▪ Install, configure, prepare test data, …
+▪ Test execution
+	▪ Perform the tests
+▪ Test reporting
+	▪ Log the test results and bugs found
+
+
+Manual and Automation Testing
+
+
+▪ Manual testing
+	▪ Type of software testing in which tests are executed manually without using any automated tools
+	▪ A human performs the tests step by step, without test scripts
+	▪ Tests are executed one by one in an individual manner
+
+▪ Automation testing
+	▪ Type of software testing in which tests are executed automatically via test automation frameworks
+	▪ Testers utilize tools and scripts to automate testing efforts
+	▪ Requires coding and test maintenance
+
+
+Different Levels of Software Testing
+
+▪ Unit tests
+	▪ Test individual component
+	▪ Created by developers
+▪ Integration tests
+	▪ Test interaction between components (e.g., APIs)
+	▪ Created by developers / QA automation engineers
+▪ System tests / end-to-end tests
+	▪ Test the entire system
+	▪ Created by QA automation engineers
+
+
+Test Driven Development
+
+▪ Test Driven Development (TDD)
+	▪ Writing actual test cases before writing the code
+▪ Helps avoiding defects and makes code clearer
+▪ Steps
+	▪ Write a test
+	▪ Run the test
+	▪ Write the code
+	▪ Run the test
+	▪ Refactor
+
+
+Bug Tracking Software
+
+▪ Bug tracking tools are essential in managing and maintaining the list of bugs, reported during software testing
+	▪ Easy reporting of defects
+	▪ Enable categorization and prioritization of bugs
+	▪ Provide utilities for documenting the steps to reproduce a bug
+	▪ Allow tracking history and progress of each bug
+▪ Commonly used tools
+	▪ JIRA, Bugzilla, Trello, Asana, GitHub
+
+
+--------------------------
+Test Levels and Test Types
+--------------------------
+The Step-by-Step Pyramid
+
+Test Levels
+▪ Unit tests
+	▪ Test single component to ensure it works as expected in isolation
+		▪ Typically, functions or methods
+▪ Integration tests
+	▪ Test interaction between components to verify they work together as intended
+▪ System tests
+	▪ Check the complete and integrated software to ensure it meets client's requirements
+▪ Acceptance tests
+	▪ Validate end-to-end business flow
+	▪ Final verification to ensure the system meets the business needs
+
+
+The Testing Pyramid
+
+▪ Unit tests: fully automated
+▪ Integration tests: fully automated
+▪ System tests / acceptance tests: partially automated
+▪ UI / UX tests: mostly manual
+
+
+
+Test Types
+
+Functional and non-functional
+▪ Black-box and white-box tests, egression tests
+▪ Stress tests, load tests, UX and sability tests, security tests
+▪ Manual vs. automated tests
+▪ Any test type can be performed at any test level
+
+
+Test Level 				Description
+------------------------------------------------------------------------------------------------
+Regression Testing 		Ensures that a fixed bug won't happen again
+------------------------------------------------------------------------------------------------
+Load / Stress Testing		Test the application's limits by attempting large data processing and introducting 						abnormal circumstances and conditions
+------------------------------------------------------------------------------------------------
+Security Testing 		Test if the application has any security flaws and vulnerabilities
+------------------------------------------------------------------------------------------------
+Other Types of Testing		Manual, automation, UI, performance, black box, end-to-end testing, A/ B, etc.
+------------------------------------------------------------------------------------------------
+
+
+Test Case
+
+▪ Test case
+	▪ А set of steps, conditions, and inputs used to test a software system to determine if it functions correctly
+▪ At least two cases to fully test certain scenario
+	▪ A positive test
+	▪ A negative test
+▪ Components
+	▪ Title (+ optional description)
+	▪ Steps to follow
+	▪ Expected result
+
+
+Test Scenarios and Test Cases – Example
+
+▪ Sample test scenario
+	▪ User registration
+▪ Test cases for this scenario
+	▪ Non-existing username → success
+	▪ Duplicated username → error
+	▪ Empty username or password → error
+	▪ Too long username → error
+	▪ Invalid characters in username / password → error
+
+
+---------------
+Test Automation
+---------------
+
+Test Automation
+
+▪ Test automation is important part of software development
+▪ Test automation is done at many levels
+	▪ Unit tests
+	▪ Integration tests
+	▪ UI tests
+▪ Test automation tools record and execute recorded tests
+	▪ Testing frameworks (JUnit, NUnit, Mocha, …)
+	▪ Automated testing tools (Selenium, Appium, Sikuli)
+	▪ Web testing, API testing, mobile testing
+
+
+Benefits of Test Automation
+
+▪ Improved accuracy
+	▪ Eliminates human errors in test execution and results
+▪ Faster feedback
+	▪ Allows for quick test execution, providing immediate feedback on software quality
+▪ Increased test coverage
+	▪ Enables testing of various scenarios, reducing the risk of missing critical test cases
+▪ Enables continuous testing
+	▪ Reduces the resources needed for repetitive manual testing
+
+
+-------------------
+Integration Testing
+-------------------
+Combine Individual Modules and Test as a Group
+
+Integration Testing
+▪ Integration testing test several components together
+	▪ Combines units and tests them as a group
+▪ Aims to expose faults in the interaction between integrated units
+	▪ Checks how well the individual parts work together
+▪ Integration testing is implemented by
+	▪ Testing framework + test stubs / mocks
+
+
+Approaches
+
+▪ Top-Down
+	▪ Testing starts at the top of the control flow or architectural structure
+▪ Bottom-Up
+	▪ Testing starts at the bottom of the control flow or architectural structure
+▪ Hybrid
+	▪ Combines Top-Down and Bottom-Up approaches
+▪ Big Bang
+	▪ All of the units are tested together at the same time
+
+
+Role in Software Development Life Cycle
+
+▪ Performed after unit testing and before system testing
+▪ Identifies problems when individual modules interact
+▪ Incremental approach
+	▪ Two modules are testes at the same time → another one is added → and another one → and so on…
+		▪ Ensures smooth interaction between components
+		▪ Helps localizing errors quickly
+		▪ Enhances test coverage
+
+
+Unit vs. Integration Testing
+
+			Integration Testing 				Unit Testing
+---------------------------------------------------------------------------------------------------------------
+Scope 			Groups components to test them together		Focus on individual components
+---------------------------------------------------------------------------------------------------------------
+Purpose 		Validate that different parts of the 		Validate functionality of separate parts of the
+			application work correctly together		application
+---------------------------------------------------------------------------------------------------------------
+Order in Dev Process 	Performed after unit testing 			First level of testing
+---------------------------------------------------------------------------------------------------------------
+Error Localization 	Harder because of grouped			Easier because of isolated
+			components					components
+---------------------------------------------------------------------------------------------------------------
+
+-----------
+API Testing
+-----------
+Testing APIs
+
+▪ API testing tests APIs directly and as part of integration testing
+▪ Aims to determine if APIs meet requirements for
+	▪ Functionality
+		▪ Includes request and response, endpoints, error codes, etc.
+	▪ Reliability
+		▪ Test consistent connection
+	▪ Performance
+		▪ Includes API's response time under various conditions
+	▪ Security
+		▪ Includes authentication, permissions and access controls
+
+Benefits
+
+▪ Early bug detection at the business layer
+▪ Ease of integration between components
+▪ Improves test coverage
+▪ Faster testing since UI test are not needed
+▪ Language independent
+	▪ Data is exchanged in XML or JSON, I/O are selected through HTTP
+▪ Enhanced application security
+▪ Supports Agile and CI/CD
+
+----------------------
+Web UI Test Automation
+----------------------
+Testing a APIs
+
+Web UI Testing
+▪ Web UI testing tests components which users interact with
+▪ Aims to determine if APIs meet requirements for
+	▪ User Experience
+		▪ UI == first point of contact with app for users
+	▪ Functionality
+		▪ Ensures all visual components work as expected
+	▪ Compatibility
+		▪ Checks whether all devices display web app correctly
+	▪ Performance
+		▪ Tests how UI performs under different conditions
+
+Playwright
+
+▪ Widely used Node.js library for end-to-end testing of web application
+▪ Allows automation of browser tasks
+▪ Supports all modern browsers
+▪ Enables testing of complex UIs
+▪ Automates form submissions, UI interactions, keyboard input, etc.
+▪ Fast and scalable
+	▪ Runs in headless mode (without UI)
+
+
+Selenium Family
+
+▪ Overview
+	▪ Popular tool for automating browsers
+	▪ Useful for cross-browser testing
+	▪ Can be used with various programming languages
+▪ Selenium Family
+	▪ Selenium IDE
+	▪ Selenium WebDriver
+	▪ Selenium Grid
+
+
+LIVE DEMO
+===========================================================
+
+FORKING
+- when we fork repo and original repo is updated we can manually sync the changes. If pull request is opened with the original repo, the sync is made automatically.
+
+Sikuli - UI testing all devices: desktop, tablet, mobile, android, mac os etc...
+
+At the end of the video is shown how to execute manual UI tests with playwrite.
+
+

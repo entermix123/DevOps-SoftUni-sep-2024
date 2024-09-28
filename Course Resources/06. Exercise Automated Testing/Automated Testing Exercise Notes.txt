@@ -1,0 +1,148 @@
+Postman and Newman
+
+We can import requests from Collections/Import. We must import env variables from Environments/Import.
+Choose environments from top right corner in request window. We can also save the variables in every request 'params' page.
+
+Set Trello with file - Trello-Autohorization - word file
+
+We can start all requests by right clicking on the collection and set parameters for manual start - 'run collection' button. 
+
+We can set automatic test start at specific time as:
+	Iterations - 1
+	delay - 0.5 - delay between requests executing
+
+
+We can install Postman CLI from - 16 min from video
+
+!!!!!
+
+
+Set Postman CLI and run tests - we can't set environment variables with postman CLI !!!
+With Postman we can run test with details with Postman UI.
+
+======
+Newman - postman CLI advanced
+======
+
+Execute of tests with CLI
+
+Install NEWMAN:
+1. install node.js 			// https://nodejs.org/en/download/package-manager
+2. terminal --> npm install -g newman	// -g - global
+
+Start collection with newman:
+	terminal --> newman run <coolection_name> -e <evironemnt_file>
+
+Install Reporter:
+	terminal --> npm install -g newman-reporter-htmlextra
+	
+Start collection with newman with reporter:
+	terminal --> newman run <coolection_name> -e <evironemnt_file> -r htmlextra
+	- new html file with the report is generated in the collection folder with htmlextra.
+
+	terminal --> newman run .\TrelloAPIFinalCollection.postman_collection.json -e <evironemnt_file> -r "cli,htmlextra"
+
+
+Grafana K6 Oen Source for load tests
+
+
+========
+Selenium - testing UI  - we can install add on for browser - search for 'Selenium IDE'
+========
+
+Install MC VS
+
+
+set project name
+set url - open page / select text / right click text/assert
+We can export the test to chosen program language.
+
+
+Open tests for selenium in MS VS
+
+Update package anager with required:
+	- right click on solution / NuGet / update package
+
+Run test from MS VS console - Package Manager Console
+
+terminal --> dotnet buid
+terminal --> dotnet test
+
+
+===================
+Selenium Web Driver - 
+===================
+
+Open test project
+
+	- right click on solution / NuGet / update package
+	terminal --> dotnet build
+	terminal --> dotnet test
+
+
+==========
+Playwright
+==========
+
+terminal --> npm install
+terminal --> npm install -D @playwright/test
+terminal --> npx playwright install
+terminal --> npm run start
+terminal --> npm run server
+terminal --> npm run test
+terminal --> npm run test --ui 		// execute test with ui
+terminal --> npx mocha api.test.js
+terminal --> 
+
+
+Integration tests:
+
+MS VS
+
+1. Open Project/Solution/Build
+
+2. Build : terminal --> dotnet build
+
+3. Start tests : terminal --> dotnet test
+
+4. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

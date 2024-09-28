@@ -1,0 +1,604 @@
+Install VSCode extention - Git History
+
+Content:
+
+1. Source Control Systems
+2. Git
+3. GitHub
+4. Basic Git Commands
+5. Git Conflicts
+6. Branching Concepts and Branching in Git
+7. Git Branching Commands
+8. Branching Strategies
+9. Common Git Branching Strategies
+10. Pull Requests in GitHub
+11. The Pull Request Process
+
+
+----------------------
+Source Control Systems
+----------------------
+Version Control System
+
+
+Software Configuration Management (SCM)
+
+▪ Version Control System ≈ Source Control System
+	▪ Tool for managing the changes during the development
+	▪ A repository keeps the source code and other project assets
+		▪ Keeps a full history of all changes during the time
+			▪ Change log shows who, when and why changed what
+	▪ Solves conflicts on concurrent changes
+		▪ Allows reverting of old versions
+▪ Popular source control systems
+	▪ Git – distributed source control (hierarchical)
+	▪ Subversion (SVN) – central repository (centralized)
+
+
+Distributed Version Control (DVC)
+
+▪ Unlike a CVC system, a DVC doesn't have a single point of failure
+▪ Developers clone repositories on their DVC workstations, creating multiple backup copies
+▪ Example: Git
+
+
+
+Centralized Version Control (CVC)
+
+▪ A CVC system relies on a central server where developers commit changes
+▪ Example
+	▪ Subversion (SVN)
+
+---
+Git
+---
+Global Information Tracker
+
+What is Git?
+
+▪ Git - https://git-scm.com/
+	▪ Distributed source-control system
+	▪ The most popular source control in the world
+	▪ Free open-source software
+	▪ Works with local and remote repositories
+	▪ Runs on Linux, Mac OS and Windows
+▪ GitHub - https://github.com/
+	▪ Social network for developers
+	▪ Free project hosting site with Git repository
+
+
+Vocabulary
+
+
+▪ Repo (repository)
+	▪ Holds the project in a remote server
+▪ Branch
+	▪ Parallel development path (separate version of the project)
+▪ Merge branches
+	▪ Merge two versions of the same projects
+▪ Clone
+	▪ Download a local copy of the remote project
+▪ Commit
+	▪ Saves a set of changes locally
+▪ Pull
+	▪ Take and merge the changes from the Remote
+▪ Push
+	▪ Send local changes to the Remote
+
+
+------
+GitHub
+------
+Source Code Hosting with Git
+
+What is GitHub?
+
+▪ GitHub: https://github.com/
+	▪ Platform and cloud-based service, based on Git
+	▪ World's most used source code host
+	▪ Used for software development and version control
+		▪ Free for open-source projects and small private projects
+		▪ Paid plans for private repositories with advanced features
+▪ GitHub Desktop: https://github.com/apps/desktop
+	▪ Enables interacting with GitHub using a GUI instead of the command line or a web browser
+
+
+GitHub Features
+
+▪ Access control
+▪ Bug tracking (Issue tracker)
+▪ Continuous Integration (Actions)
+▪ Wiki pages (Documentation)
+▪ Software feature request
+▪ Task management
+▪ Project board (Kanban style)
+▪ Etc.
+
+
+------------------
+Basic Git Commands
+------------------
+Clone ⟶ Modify ⟶ Add ⟶ Commit ⟶ Push
+
+Basic Git Commands
+
+▪ Clone an existing Git repository
+	git clone [remote url]
+▪ Fetch and merge the latest changes from the remote repository
+	git pull
+▪ Prepare (add / select) files for a commit
+	git add [filename] ("git add ." adds everything)
+▪ Commit to the local repository
+	git commit –m "[your message here]"
+
+
+-------------
+Git Conflicts
+-------------
+Merging Git Conflicts
+
+Git Conflict
+
+▪ Conflicts generally arise when two or more people change the same file simultaneously
+	▪ Or if a developer deletes a file while another developer is modifying it
+▪ In these cases, Git cannot automatically determine what is correct
+▪ Conflicts only affect the developer conducting the merge
+▪ The rest of the team is unaware of the conflict
+
+
+-------------------------------------
+Branching Concepts & Branching in Git
+-------------------------------------
+Creating and Merging Branches
+
+
+What is Branching?
+
+▪ Branches allow you to work on different parts of a project without impacting the main / master branch
+	▪ Serve as an abstraction for the edit / stage / commit process
+▪ Represent a way to request a brand new working directory, staging area, and project history
+	▪ Any new commits are recorded in the history for the current branch
+		▪ Without impacting the main branch until it's decided to integrate the changes
+▪ You can switch between branches and work on different projects without them interfering with each other
+
+
+Branches == Built-In Feature of Git
+
+▪ Branching is available in most version control systems
+	▪ In some version control systems it can be an expensive operation in both time and disk space
+▪ In Git, branches are a part of the everyday development process
+▪ Git branches are an effective pointer to a snapshot of a developer's changes
+
+----------------------
+Git Branching Commands
+----------------------
+View / Switch / Delete Branches
+
+
+Local vs. Remote Branches
+
+▪ Local branch
+	▪ Branch in your local Git repo
+	▪ Changes tracked only locally
+▪ Remote branch
+	▪ Branch inside the remote repository (e.g. in GitHub)
+▪ Upstream branch
+	▪ Remote branch, connected to your local branch
+	▪ When you push changes, they are sent to the upstream branch
+
+
+Git Branching Commands
+
+▪ Create a new local branch
+	git branch {branch-name}
+▪ Switch to certain existing branch
+	git switch {branch-name}
+	git checkout {branch-name}
+▪ Create a new branch and switch to it
+	git checkout -b {branch-name}
+
+▪ List all local and remote branches
+	git branch -a
+	git branch --all
+▪ List local together with the last commit message
+	git branch --verbose
+	git branch -vv
+▪ List all local and remote branches with the last commit message
+	git branch --all --verbose
+	git branch –a -vv
+
+▪ List local branches
+	git branch
+▪ Push to a new upstream (in a new remote branch)
+	git push --set-upstream origin {branch-name}
+	git push -u origin {branch-name}
+▪ Merge another branch in the active branch
+	git merge {branch-name}
+
+▪ Delete a local branch
+	git branch -d {branch-name}
+▪ Delete a remote branch
+	git push origin -d {branch-name}
+▪ Reapply commits on top of another base tip
+	git rebase {base-branch-name}
+▪ Include specific commits without merging the entire branch
+	git cherry-pick {branch-name}
+
+
+Git Squash
+
+▪ Combining multiple commits into a single commit
+▪ Useful for cleaning up commit history before merging a feature branch into the main branch
+	▪ Makes commit history simpler and more understandable
+▪ Usually applied during use of other commands, e.g.
+	▪ git rebase
+	▪ git merge
+▪ Rewrites history and must be used with caution!
+
+
+--------------------
+Branching Strategies
+--------------------
+Strategy Simple Branch
+
+What is a Branching Strategy?
+
+▪ Branching strategy
+	▪ A strategy that programmers adopt while writing, merging and deploying code when using a VCS
+▪ It is essentially a set of rules that developers can follow to stimulate how they interact with a shared codebase
+▪ It enables teams to work in parallel to achieve faster releases and fewer conflicts
+	▪ By creating a clear process when making changes to source control
+
+
+Purposes of Branching Strategy
+
+▪ Enhance productivity by ensuring proper coordination among developers
+▪ Help organize a series of planned, structured releases
+▪ Map a clear path when making changes to software through to production
+▪ Maintain a bug-free code
+▪ Enable parallel development
+
+-------------------------------
+Common Git Branching Strategies
+-------------------------------
+
+Trunk-Based Development
+
+▪ Trunk-based development
+	▪ "No branches" strategy
+	▪ Developers integrate their changes into a shared trunk at least once a day
+▪ Make smaller changes more frequently and commit directly into the trunk (without the use of branches)
+	▪ This shared trunk should be ready for release anytime
+▪ This strategy is suited to more senior developers
+
+
+GitHub Flow
+
+▪ GitHub Flow
+	▪ Lightweight and flexible development workflow
+	▪ Each feature is implemented in its own branch
+	▪ Keep the master code in a constant deployable state
+▪ Before merging, each branch comes through a Pull Request and code review, then the changes are tested and integrated
+
+
+GitFlow
+
+▪ GitFlow
+	▪ Enables parallel development
+	▪ Devs can work separately from the master branch on features
+▪ This strategy contains separate and straightforward branches for specific purposes
+	▪ Ideal to handle multiple versions of the product
+
+
+GitFlow Branches
+
+▪ Master (main)
+	▪ Holds the active production code
+▪ Release
+	▪ Help prepare a new production release
+▪ Hotfix
+	▪ Hotfix branches arise from a bug that has been discovered and must be resolved
+▪ Develop
+▪ Feature
+	▪ Develop new features
+
+
+GitLab Flow
+
+▪ GitLab Flow
+	▪ Combines feature-driven development and feature branching with issue tracking
+	▪ Each feature is implemented in its own branch
+	▪ Developers work with the main branch right away
+	▪ The main branch is deployed to production (manually or auto)
+
+
+No Standard for "Branching Strategy"
+
+▪ Different organizations use different branching strategies for each different team / project
+	▪ There is no "best branching strategy"
+	▪ How to use branches highly depends on
+		▪ The team
+		▪ The project under development
+
+
+-----------------------
+Pull Requests in GitHub
+-----------------------
+Show Changes You’ve Pushed
+
+
+Pull Requests in GitHub
+
+▪ Pull requests
+	▪ A mechanism for developers to notify their team members that they have completed a feature
+▪ The pull request is more than just a notification—it's a code review process, including discussions on the proposed feature
+▪ If there are any problems with the changes, teammates can post feedback in the pull request
+▪ This activity is tracked directly inside of the pull request
+
+
+Pull Requests
+
+▪ Pull requests let you tell others about changes you want to push to a branch in a repository on GitHub
+▪ Once a pull request is opened, you can discuss and review the potential changes with collaborators
+▪ You can create pull requests on GitHub.com, in GitHub Desktop or in other GitHub tools
+
+
+Branch Protection Rules
+
+▪ You can create a branch protection rule in a repo
+	https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/managing-a-branch-protection-rule
+	▪ Can be created for
+		▪ A specific branch
+		▪ All branches
+		▪ Any branch that matches a name pattern you specify with fnmatch syntax
+▪ For example, you can create a branch protection rule to prevent contributors from merging to a branch without an approved pull request
+
+------------------------
+The Pull Request Process
+------------------------
+Notify Team for a Completed Feature
+
+
+=========
+LIVE DEMO
+=========
+
+Access Control
+▪ Privet Repo
+	- repo settings / collaborators
+	- search by email
+▪ Bug tracking
+	- Issues
+	- create issue
+
+Set upstream to main branch to remote main branch:
+	terminal --> git push -u branch_name
+
+
+=====================
+Exercise Git & GitHub
+=====================
+
+Most used commands
+
+Show git status:
+	- git status
+
+working some code ...
+
+stage files:
+	- git add <file_name> <file_name_2>
+	- git add .
+
+commit changes:
+	- git commit -m "commit message"
+
+push changes:
+	- git push
+
+Show logs on one line:
+	- git log --oneline
+
+Create branch and make it active:
+	- git checkout -b <branch_name>
+
+Create branch only:
+	- git branch branch_name
+
+Move to different branch:
+	- git checkout branch_name_2
+	- git swaitch branch_name_2
+
+Show branches:
+	- git branch -a		# show all branches + remote
+
+Show branches + changes:	# preferable
+	- git branch -vv	# show also current branch
+
+Add remote repo to local repo:
+	- git remote add origin <repo_url>
+
+Connect local main with remote main (upstream):
+	- git push --set-upstream origin main
+	- git push -u origin branch_name	# conntect or create remote branch
+
+Take all differences from remote repo:
+	- git pull
+
+Delete branch:
+	- git branch -d branch_name	
+
+Delete remote branch:
+	- delete branch locally
+	- git push origin -b branch_name
+
+Rollback with reset:
+	- show logs
+	- git log
+	- find the commit
+	- git reset --hard commit_id		# works only if commit is not pushed
+	- git push --force			# push reset 
+
+
+
+------------
+Merges Local
+------------
+
+Create branch rebase:
+	- git checkout -b mergebranch
+
+Create file in different branch:
+	- echo test.txt
+
+Stage and commit test.txt file:
+	- git add .
+	- git commit -m "added test file"
+
+Move to main branch:
+	- git checkout main
+
+Merge branch into current:
+	- git nerge mergebranch
+
+------
+Rebase
+------
+
+Create branch rebase:
+	- git checkout -b rebasebranch
+
+Create file in different branch:
+	- echo test.txt
+
+Stage and commit test.txt file:
+	- git add .
+	- git commit -m "added test file"
+
+Move to main branch:
+	- git checkout main
+
+Rebase current with other branch:
+	- git rebase other branch_name
+
+The difference between Rebase and Merge is:
+	- Merge - added history (log) line
+	- Rebase do not add history (log) line 
+
+Install VSCode extention - Git History
+
+
+----------
+Cherrypick
+----------
+
+Take specific commits from other branch:
+	show commits ids:
+	- git log --oneline
+	- take commit_id
+	take specific commit:
+	- git cherry-pic commit_id
+
+------
+Squash - simplify commit history - commit few small commits to one commit
+------
+
+Create first file:
+	- echo test.txt
+
+Stage first commit test.txt:
+	- git add .
+	- git commit -m "added test file"
+
+Create second file:
+	- echo test2.txt
+
+Stage second commit test.txt:
+	- git add .
+	- git commit -m "added test2 file"
+
+Merge first and second commits in one commit.
+	- git rebase -i HEAD~3	# how many commits behind? - 3
+	- showing screen with options. We have to set scripts
+	- second screen appear and we can manage message of the commit
+	- when the second screen is cloed, the changes are set
+
+
+-----------------
+Branch strategies
+-----------------	
+
+Trunk based development - changes are make on small commits. Must be ready for deploay any time. For senior developers.
+	- no branch strategy - all work in one branch (main) !!! not preferable
+
+GitHub Flow - flexible - for every issue we have different branch
+	- before merging is created pull request
+
+# preferable
+GitFlow - Few GiHub branches - Main, Development, Feature1-2-3, QA-Test, PreProduction, Production etc.
+	- access for different deveopers, QA for different branches
+
+GitLab Flow - main, pre-production and production branches
+
+
+------------
+Pull request - defend main branch and the project against not well made code and merges.
+------------
+
+Pull request can be created for every 2 branches but the must be difference!
+
+Set rules for specific branches:
+	- settings
+	- branches
+	- add classic branch protection rule
+		- branch name pattern - set for group name like "feat*"
+	- set specific branch name for protected and set password
+		- check pull request required
+		- require approval
+		- check do not allow bypass settings above - set admin must create pull request
+
+
+	
+LGTM - looks goot to me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
