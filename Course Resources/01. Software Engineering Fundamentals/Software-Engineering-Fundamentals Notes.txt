@@ -1,0 +1,424 @@
+Content:
+1. Software Development Lifecycle
+2. Software Requirements
+3. Software Architecture and Design
+4. Software Construction
+5. Software Quality Assurance
+6. Deployment and Maintenance
+
+
+Software Development Lifecycle (SDLC)
+Requirements, User Stories, Prototypes, Specification
+
+Software Requirements
+▪ Software requirements describe the functionality of the software
+	▪ Answer the question "what shall it do?", not "how shall it do it?"
+	▪ Define constraints on the system	!!!
+▪ Two kinds of requirements
+	▪ Functional requirements
+		▪ Product functions, enabling users to achieve their tasks
+	▪ Non-functional requirements
+		▪ Reliability, efficiency, usability, maintainability, etc.
+
+
+Requirements Analysis
+▪ Requirements analysis starts from an idea about the system
+	▪ Customers often have a broad idea but may lack specifics
+	▪ Requirements come roughly → adjusted during the development
+	▪ Requirements change constantly!
+▪ Analysis produces some requirements documentation
+	▪ User stories / UI prototype / Software Requirements Specification (SRS) / informal system description
+		▪ Should be clear, concise and unambiguous
+
+
+
+Software Requirements Change Over Time
+
+▪ It is always hard to describe and document the requirements in a comprehensive way
+	▪ Good requirements save time and money, but are hard to reach
+▪ Requirements always change during the project!
+	▪ Good requirements reduce the changes
+	▪ UI prototypes significantly reduce changes
+	▪ Agile methodologies are flexible to changes
+	▪ Use user story tracking tools to handle changing requirements
+
+
+
+
+Software Architecture and Design
+
+▪ Software architecture and design
+	▪ Technical descriptions (e.g., diagrams) about how the system implements the requirements
+▪ The software (system) architecture describes the subsystems, their responsibilities and interactions
+	▪ High-level infrastructure of a software system
+	▪ Good software architecture == easier maintenance and scalability
+
+▪ The software design describes the system design at a lower-level
+	▪ Functions of individual modules, classes, etc.
+▪ Design patterns in software design
+	▪ Proven solutions to recurring problems
+	▪ Fundamental in software engineering
+
+
+
+System Architecture
+
+▪ The system architecture is a conceptual model, describing
+	▪ How the system will be decomposed into modules (subsystems)
+	▪ Responsibilities of each module
+	▪ Interaction between the modules
+	▪ Platforms and technologies, communication protocols
+▪ Can be formal or informal (typically)
+	▪ Consists mostly of diagrams / blueprints
+
+
+System Architecture Diagram
+Picture
+
+Software Architecture Diagram
+Picture
+
+
+Software Design
+
+▪ Detailed design
+	▪ Describes the internal module structure
+	▪ Subcomponents, interfaces, process design, data design
+▪ Object-oriented design
+	▪ Describes the classes, their responsibilities, relationships, dependencies, and interactions (usually in UML)
+▪ Internal class design
+	▪ Methods, responsibilities, algorithms and interactions
+
+
+UML Class Diagram
+
+Picture
+
+▪ UML Class diagrams
+	▪ UML == Unified
+	Modeling Language
+
+	▪ Visualize classes and
+	their relationships
+
+
+Flowchart Diagram
+
+▪ Flowchart diagrams
+	▪ Visualizes a decision logic / calculation / algorithm
+
+Picture
+
+
+Software Design Document (SDD)
+
+▪ The Software Design Document (SDD)
+	▪ Formal description of the architecture and design of the system
+▪ Essential for software development process
+	▪ Makes communication between collaborators easier
+	▪ Often used for future references
+	▪ Ensures the entire team has a clear understanding of the system's design
+		▪ Beneficial when onboarding new team members
+
+▪ What's typically inside?
+	▪ Architectural design
+		▪ Modules and interactions (diagram)
+	▪ For each module
+		▪ Process design (diagrams)
+		▪ Data design (E/R diagram)
+		▪ Object-oriented design (class diagram)
+
+
+======================
+Software Construction
+======================
+Implementation, Unit Testing,
+Debugging, Integration
+
+
+Software Construction
+
+▪ During the construction phase developers build the software
+	▪ Sometimes it is called "implementation phase"
+▪ Software construction includes
+	▪ Method design
+	▪ Writing the source code
+	▪ Testing and debugging
+	▪ Writing the unit tests
+	▪ Code reviews and inspections
+	▪ Integration of classes / modules
+
+
+Writing the Code
+
+▪ Coding
+	▪ The process of writing the programming code (the source code), running and debugging it
+	▪ The code adheres to established architecture and design
+	▪ Developers perform method design as part of coding
+▪ The source code is the output of the software construction process
+	▪ Written by developers
+	▪ Can include tests (unit, integration, others)
+
+
+
+Testing the Code
+
+▪ Testing
+	▪ The process of checking whether the developed software conforms to the requirements
+	▪ Aims to identify defects (bugs)
+▪ System testing is done by the QA engineers
+	▪ Unit / integration testing is done by developers
+▪ Developers test the code after writing it
+	▪ Run it at least once to see the results
+	▪ Unit testing / integration testing work better	
+	▪ Automated tests are repeatable, executed many times
+
+
+Debugging
+
+▪ Debugging
+	▪ Finding the source of an already identified bug and fixing it
+		▪ Performed by developers (constantly)
+		▪ Steps in debugging
+	▪ Find the defect in the code
+	▪ Identify the source of the problem
+	▪ Identify the exact place in the code causing it
+	▪ Fix the defect (modify the source code)
+	▪ Test to check if the fix is working correctly
+	▪ Write a unit test for the defect to avoid it reoccurring further
+
+
+Software Verification Activities
+
+▪ Inspections: requirements / design / code inspections
+	▪ Aim to find flaws early, e.g., in the requirements
+	▪ Performed by an experienced dev / QA engineer
+▪ Code reviews: developer reviews the code
+	▪ Find flaws / bugs / improve quality
+▪ Static analysis: software tools scan the source code for problems	-	not working code - not started
+	▪ Security, code quality, potential bugs, etc.
+▪ Dynamic analysis: tools asses runtime code to find flaws		-	working code - started app
+	▪ Memory issues, bad performance, arithmetic overflows, etc.
+
+
+Code Reviews
+
+▪ Code reviews - check lists for requirements (code review check list)
+	▪ Assessments of the source code and other assets
+	▪ Developer A reviews the code written by Developer B
+	▪ Goals
+		▪ Identify bugs
+		▪ Increase code quality
+		▪ Apply best practices
+		▪ Help developers learn the source code and from other developers
+
+▪ Code reviews can be
+	▪ Formal or informal
+	▪ Live or offline
+▪ Code review tools are used to perform code reviews online
+	▪ Example: GitHub Pull Requests
+	▪ Code under review gets improvement suggestions and comments
+	▪ Code under review can finally be rejected or approved
+
+
+Software Integration
+
+▪ Software integration
+	▪ Combining multiple software systems to work together seamlessly and efficiently
+		▪ Enabling data exchange between them
+	▪ Enhances overall productivity
+		▪ Reduces redundancy
+		▪ Improves efficiency
+	▪ Compile, run and deploy separate modules as a single system
+	▪ Test to identify defects (integration testing)
+
+
+Software Integration Strategies
+
+▪ Big bang
+	▪ All or almost all modules are integrated together at the same time
+▪ Top-down
+	▪ Integration of the higher-level layers first
+▪ Bottom-up
+	▪ Lower layers first
+▪ Continuous integration (CI)
+	▪ Integrate after each commit in the source control system
+
+
+Continuous Integration (CI)
+
+▪ Continuous integration (CI)
+	▪ Integrating the code from different developers frequently (several times a day)
+	▪ Automated building and testing the software
+		▪ Typically, at Git push in a certain branch
+	▪ Finding integration problems and bugs early
+		▪ Continuously maintain software quality
+▪ CI is implemented by a CI system like Jenkins, GitHub Actions, TeamCity, Azure Pipelines
+
+
+CI/CD Pipeline
+
+▪ CI/CD pipeline
+	▪ Continuously integrate and release new features
+▪ Continuous integration (CI)
+	▪ Write code, test and integrate it in the product
+▪ Continuous delivery (CD)
+	▪ Continuously release new features
+▪ Often QA engineers maintain and monitor the CI/CD pipeline
+
+
+
+===============================
+Software Quality Assurance (QA)
+===============================
+Software Quality, Testing, QA Process
+
+
+Software Quality Assurance (QA)
+
+▪ What is "software quality assurance" (SQA)?
+	▪ Software quality assurance aims to
+		▪ Minimize software defects
+		▪ Ensure it behaves as expected
+	▪ Defects are reported and tracked through a bug tracking system
+	▪ Performed by the Quality Assurance engineers (QA engineers)
+▪ Continuous integration and delivery (CI/CD pipeline)
+
+
+Quality Assurance (QA) Engineers
+
+▪ QA engineers ensure the software quality
+▪ Plan and execute testing activities
+	▪ Test the software, its functionality, UX, etc.
+	▪ Create test plans, design test cases, execute tests
+	▪ Develop and execute test automation scripts
+▪ Report and track bugs and their lifecycle
+	▪ Perform regression testing when bugs are resolved
+▪ Track the development process and its quality
+	▪ Review the requirements, design and code
+	▪ Build and monitor CI/CD pipeline, track QA metrics
+
+
+
+Bugs and Bug Tracking
+
+▪ Defects (bugs) in software are problems in the source code / requirements / design, which cause incorrect behavior
+▪ Once found (typically by the QA), bugs are tracked in a bug trackers / issue tracking software
+	▪ Examples: Jira, GitHub Issues
+▪ Bugs have a lifecycle
+	▪ new → assigned / rejected → fixed → closed / reopened
+
+
+
+Test Plan, Test Scenarios and Test Cases
+
+▪ Test plan
+	▪ A guiding document outlining the testing approach, environments, schedule, and acceptance criteria to ensure software meets quality requirements
+▪ Test Scenarios
+	▪ High-level descriptions/stories representing the functionality or feature to be tested in the software
+▪ Test Cases
+	▪ Detailed, step-by-step instructions designed to validate specific conditions or functions of the software based on the associated test scenarios
+
+
+
+Manual and Automation Testing
+
+▪ Most of the QA work is software testing
+	▪ Manual testing
+		▪ Fill forms
+		▪ Click
+		▪ Check the results
+	▪ Automated testing
+		▪ QA automation
+		▪ Test cases as code
+
+
+
+==========================
+Deployment and Maintenance
+==========================
+Deployment Environments, Maintenance Process
+
+
+Software Deployment
+
+▪ What is software deployment?
+	▪ Getting software out of the hands of the developers into the hands of the users
+	▪ Compile, package, install, configure and run the software into the customer environment / ship the app to the customer
+		▪ Web app → deploy the new version to the Web servers
+		▪ Mobile app → publish a new version to app stores
+		▪ Desktop app → release a new version installer to the customers
+
+▪ Continuous deployment (CD)
+	▪ Automatically deploy the software after each commit → ensure the changes are deployable
+
+
+Deployment Environments
+
+
+▪ Dev environment
+	▪ Used by developers
+	▪ No client data
+
+▪ Test environment
+	▪ Used by QA engineers
+	▪ No client data
+
+▪ Staging environment
+	▪ Used by QA engineers and/or clients for UAT
+	▪ Limited production data
+
+▪ Production environment
+	▪ Used by clients
+	▪ Full Production data
+
+
+
+Container-Based Deployment Environments
+
+▪ Containers and clouds simplify creating, configuring and running the required environments
+
+
+Software Maintenance
+
+▪ What is software maintenance?
+	▪ The process of changing a system after it has been released
+▪ Reasons for maintenance changes
+	▪ Fixing bugs and patching security vulnerabilities
+	▪ Changing business needs: new features and requirements
+	▪ Adapting to new environments: hardware / platforms / software
+▪ Typical change process
+	▪ Analysis → requirements → issue backlog → prioritization
+	▪ For each fix: design / re-engineering → code → QA → deploy
+
+
+Software Documentation
+
+▪ Documentation makes software maintainable
+	▪ Allow new people to join the development team over the time
+▪ Best practices in software documentation
+	▪ Visualize the development process (use a project board)
+	▪ Written requirements (in a requirements tracking system)
+	▪ Design and architecture documents (e.g., project Wiki)
+	▪ Code documentation (comments and built-in docs in the code)
+	▪ Test management system and CI system (with a dashboard)
+	▪ User documentation, installation guide, quick start guide, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
