@@ -1,0 +1,116 @@
+1. Using Git Commands
+
+Clone repo:
+	- create repos folder and clone or fork repo
+		terminal --> git clone https://github.com/entermix123/playground_repo.git
+	
+	- make changes in README.md
+		- stage changes
+			terminal --> git add .
+		- commit changes
+			terminal --> git commit -m "changes"
+		- push changes to my forked repo
+
+2. Git Conflict Scenario
+
+	- make changes and commit them from different accounts
+	- decide what changes to keep:
+		• To see the beginning of the merge conflict in the file, search the file for the conflict marker <<<<<<<
+		• You'll see the changes from the HEAD after the line <<<<<<< HEAD
+		• Next, you'll see =======, which divides your changes from the changes in the other branch, 
+		followed by >>>>>>> name
+		• Delete the conflict markers <<<<<<<, =======, >>>>>>> and make the changes you want in the final merge
+
+	- stage changes
+		terminal --> git add .
+	- commit changes
+		terminal --> git commit -m "resolved merge conflict"
+	- if conflict is resolved locally, push changes to remote repo:
+		terminal --> git push
+
+
+3. Git Branches
+
+Clone repo if not cloned locally:
+	- create remote and local repos folder and clone
+		terminal --> git clone https://github.com/SUContent/Branching-Demo
+	- make changes
+		- add downloaded resources
+	- check status
+		- terminal --> git status
+	- stage changes
+		terminal --> git add .
+	- commit changes
+		terminal --> git commit -m "initial commit"
+	- push changes
+		terminal --> git push
+	
+4. Create a New Branch
+	- create new branch 'add-title'
+		terminal --> git checkout -b 'add-title'
+
+	- make changes to index.html and stage and commit changes
+		- terminal --> git add .
+		- terminal --> git commit -m "changed index.html"
+
+	- try to push to remote repo
+		- terminal --> git push
+
+	error must appear and we must set upstream to the remote branch
+	- set upstream to remote repo
+		terminal --> git push --set-upstream origin add-title
+
+	- try to push to remote repo again if not pushed automatically
+		- terminal --> git push
+
+	- we can see branches
+		- terminal --> git branch
+
+	- we can go to different branch
+		terminal --> git switch <branch_name>
+		terminal --> git checkout <branch_name>
+
+7. Merge Branches
+	- switch to the "main" branch and merge it with "add-title"
+		terminal --> git checkout main
+		terminal --> git merge add-title
+	
+8. Delete Branch
+	- go to different branch from that you want to delete
+		terminal --> git switch main
+		or
+		terminal --> git checkout main
+
+	- delete ranch
+		terminal --> git branch -d add-title
+
+
+9. Creating a Pull Request
+	- create new branch "add-form"
+		terminal --> git checkout -b "add-form"
+
+	- make changes and stage and push to remote repo
+		terminal --> git add .
+		terminal --> git commit -m "made some changes"
+		terminal --> git push
+
+	- create pull request in GitHub UI
+		- set requirements for merging
+		- merge and close pull request
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
