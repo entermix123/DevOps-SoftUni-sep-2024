@@ -1,0 +1,518 @@
+Exercises: Git Branching and Pull Requests
+
+
+Extract resources from downloaded zip file.
+	- right click on the file / Extract All / Uncheck [] Show extracted files when complete
+	- solution files also can be found
+
+
+I. The "Towns" Project
+
+Fork the repo:
+	terminal --> https://github.com/entermix123/Towns-fork.git
+
+You can open and start the project locally in VSCode as:
+	- clone and open FORKED project folder with VSCode
+		- navigate to folder and clone the repo
+			terminal --> git clone <repo_url>
+	- Install live Server - https://github.com/ritwickdey/vscode-live-server-plus-plus
+		- open VSCode Extensions and search for 'live server', install the extension
+	- right click on towns.html / open with live server
+
+Create new branch "development"
+	- terminal --> git checkout -b development
+Set upstream (create the branch in the remote repo)
+	- terminal --> git push --set-upstream origin development
+
+
+=================================
+Implement Project Functionalities
+=================================
+
+
+------
+Editor
+------
+
+in towns.html:
+------------------------------------------------------
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Towns</title>
+	<link rel="stylesheet" href="towns.css" />
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="towns.js"></script>
+</head>
+
+<body>
+
+<h1>Towns</h1>
+<select id="towns" size="4">
+    <option>Sofia</option>
+    <option>Plovdiv</option>
+    <option>Varna</option>
+    <option>Bourgas</option>
+</select>
+
+<div>
+    <input type="text" id="townName" />
+    <button id="btnDelete">Delete</button>
+</div>
+<div id="result"></div>
+
+<div>
+    <input type="text" id="townNameForAdd" />
+    <button id="btnAdd">Add</button>
+    </div>
+
+</body>
+
+</html>
+------------------------------------------------------
+
+
+in towns.js:
+------------------------------------------------------
+$(document).ready(function() {
+	$('#btnDelete').click(deleteTown);
+	$('#btnAdd').click(addTown);
+});
+
+function deleteTown() {
+	let townName = $('#townName').val();
+	$('#townName').val('');
+	let removed = false;
+	for (let option of $('#towns option')) {
+		if (option.textContent == townName) {
+			removed = true;
+			option.remove();
+		}
+	}
+	if (removed)
+		$('#result').text(townName + " deleted.");
+	else
+		$('#result').text(townName + " not found.");
+}
+
+function addTown() {
+	let townName = $('#townNameForAdd').val();
+	$('#townNameForAdd').val('');
+	$('#towns').append($('<option>').text(townName));
+	$('#result').text(townName + " added.");
+	}
+------------------------------------------------------
+
+
+stage and commit changes
+	terminal --> git commit -a -m "Implemented functionality to add a new town as editor"
+push changes to remote repo
+	terminal --> git push
+
+resolve conflicts if any. 
+	terminal --> git pull
+
+
+
+--------
+Shuffler
+--------
+
+in towns.html:
+------------------------------------------------------
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Towns</title>
+	<link rel="stylesheet" href="towns.css" />
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="towns.js"></script>
+</head>
+
+<body>
+
+<h1>Towns</h1>
+<select id="towns" size="4">
+    <option>Sofia</option>
+    <option>Plovdiv</option>
+    <option>Varna</option>
+    <option>Bourgas</option>
+</select>
+
+<div>
+    <input type="text" id="townName" />
+    <button id="btnDelete">Delete</button>
+</div>
+<div id="result"></div>
+
+<div>
+    <input type="text" id="townNameForAdd" />
+    <button id="btnAdd">Add</button>
+</div>
+
+<div>
+    <button id="btnShuffle">Shuffle</button>
+</div>
+
+</body>
+
+</html>
+------------------------------------------------------
+
+
+in towns.js:
+------------------------------------------------------
+$(document).ready(function () {
+    $("#btnDelete").click(deleteTown);
+    $("#btnAdd").click(addTown);
+	$('#btnShuffle').click(shuffleTowns);
+});
+
+function deleteTown() {
+    let townName = $("#townName").val();
+    $("#townName").val("");
+    let removed = false;
+    for (let option of $("#towns option")) {
+        if (option.textContent == townName) {
+            removed = true;
+            option.remove();
+        }
+    }
+    if (removed) $("#result").text(townName + " deleted.");
+    else $("#result").text(townName + " not found.");
+}
+
+function addTown() {
+    let townName = $("#townNameForAdd").val();
+    $("#townNameForAdd").val("");
+    $("#towns").append($("<option>").text(townName));
+    $("#result").text(townName + " added.");
+}
+
+function shuffleTowns() {
+    let towns = $("#towns option").toArray();
+    $("#towns").empty();
+    shuffleArray(towns);
+    $("#towns").append(towns);
+    $("#result").text("Towns shuffled.");
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var oldElement = array[i];
+            array[i] = array[j];
+            array[j] = oldElement;
+        }
+    }
+}
+
+------------------------------------------------------
+
+stage and commit changes
+	terminal --> git commit -a -m "Implemented functionality to add a new town as shuffler"
+push changes to remote repo
+	terminal --> git push
+
+resolve conflicts if any
+	- update local project
+		terminal --> git pull
+	- edit conflicts
+	- commit the resolved code with different message
+		terminal --> git commit -a -m "Implemented functionality to shuffle the existing towns + merged the conflicting files"
+	- push changes to remote repo
+		terminal --> git push
+
+
+--------
+Styler
+--------
+
+in towns.html:
+------------------------------------------------------
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Towns</title>
+	<link rel="stylesheet" href="towns.css" />
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="towns.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+</head>
+
+<body>
+
+<article>
+    <header>Towns</header>
+    <select id="towns" size="4">
+    <option>Sofia</option>
+    <option>Plovdiv</option>
+    <option>Varna</option>
+    <option>Bourgas</option>
+    </select>
+</article>
+
+<article>
+    <header>Delete Existing Town</header>
+    <input type="text" id="townName" />
+    <button id="btnDelete">Delete</button>
+</article>
+
+<article>
+    <button id="btnShuffle">Shuffle</button>
+</article>
+
+
+<article>
+    <input type="text" id="townNameForAdd" />
+    <button id="btnAdd">Add</button>
+</article>
+
+<div id="result"></div>
+
+</body>
+
+</html>
+------------------------------------------------------
+
+
+in towns.css
+------------------------------------------------------
+@import url("https://fonts.googleapis.com/css?family=Rubik");
+body {
+    font-family: "Rubik", sans-serif;
+}
+* {
+    box-sizing: content-box;
+}
+article {
+    background: #ccc;
+    width: 180px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+article > header {
+    background: #5f5f5f;
+    color: white;
+    margin: 0px 0px 10px 0px;
+    padding: 4px 6px;
+}
+article > header > h1 {
+    margin: 0px;
+}
+article > select {
+    width: 178px;
+}
+article > input {
+    width: 176px;
+}
+article > button {
+    display: block;
+    margin: 10px auto 0px auto;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 15px;
+    background: green;
+    color: white;
+    font-weight: bold;
+}
+article > button:hover {
+    box-shadow: 0px 0px 10px white;
+    cursor: pointer;
+}
+button#btnDelete {
+    background: red;
+}
+#result {
+    display: none;
+    width: 50%;
+    margin: 10px auto;
+    padding: 10px 15px;
+    background: #ddd;
+    border-radius: 5px;
+    border: 1px solid #777;
+}
+------------------------------------------------------
+
+
+in towns.js:
+------------------------------------------------------
+
+$(document).ready(function () {
+    $("#btnDelete").click(deleteTown);
+    $("#btnAdd").click(addTown);
+    $("#btnShuffle").click(shuffleTowns);
+});
+
+function addTown() {
+    let townName = $("#townNameForAdd").val();
+    $("#townNameForAdd").val("");
+    $("#towns").append($("<option>").text(townName));
+    $("#result").text(townName + " added.");
+}
+
+function shuffleTowns() {
+    let towns = $("#towns option").toArray();
+    $("#towns").empty();
+    shuffleArray(towns);
+    $("#towns").append(towns);
+    $("#result").text("Towns shuffled.");
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var oldElement = array[i];
+            array[i] = array[j];
+            array[j] = oldElement;
+        }
+    }
+}
+
+function deleteTown() {
+    let townName = $("#townName").val();
+    $("#townName").val("");
+    let removed = false;
+    for (let option of $("#towns option")) {
+        if (option.textContent == townName) {
+            removed = true;
+            option.remove();
+        }
+    }
+    if (removed) showMessage(townName + " deleted.");
+    else showMessage(townName + " not found.");
+}
+function showMessage(msg) {
+    $("#result").text(msg).css("display", "block");
+    setTimeout(function () {
+        $("#result").hide("blind", {}, 500);
+    }, 3000);
+}
+------------------------------------------------------
+
+stage and commit changes
+	terminal --> git commit -a -m "Improved styling and effects for the functionality to add a new town"
+push changes to remote repo
+	terminal --> git push
+
+resolve conflicts if any
+	- update local project
+		terminal --> git pull
+	- edit conflicts
+	- commit the resolved code with different message
+		terminal --> git commit -a -m "Improved the UI: added CSS styles + HTML structure + JS effects as styler"
+	- push changes to remote repo
+		terminal --> git push
+
+
+II. The "Hotel Reservation" Project
+
+
+Create and Clone Repo in GitHub.com
+
+Clone the repo locally
+	- navigate to appropriate folder and clone the repo
+	terminal --> git clone <repo_url>
+
+Create development branch and set upstream (connect to or create) remote branch
+	terminal --> git checkout -b development
+	terminal --> git push --set-upstream origin development
+
+Add resources to local repo, stage, commit and push to remote repo
+	- add resources
+	terminal --> git commit -a -m "added basic resources"
+	terminal --> git push
+	
+
+
+Implementing Functionalities
+
+----------
+Questioner
+----------
+
+Create new branch 'search-form'
+	terminal --> git checkout -b search-form
+	terminal --> git push --set-upstream origin search-form
+
+Add code from resources in the repo
+	- style.css
+	- add code in resources/Questioner/index.html to repo/index.html
+
+Stage, commit and push changes
+	terminal --> git commit -a -m "Implemented Search form functionality as Questioner"
+	terminal --> git push
+
+In GitHub repo create Pull Request and merge search-form to development
+	- in the top right corner of the pull request page we must request review from our colleague
+	- the colleague review the code, resolve conflicts if any, approve our pull request and commit merge
+
+
+-------
+Offerer
+-------
+
+Create new branch 'search-form'
+	terminal --> git checkout -b our-offers-form
+	terminal --> git push --set-upstream origin our-offers-form
+
+Add code from resources in the repo
+	- style.css
+	- add code in resources/Questioner/index.html to repo/index.html
+
+Stage, commit and push changes
+	terminal --> git commit -a -m "Implemented Search form functionality as Questioner"
+	terminal --> git push
+
+In GitHub repo create Pull Request and merge search-form to development
+	- in the top right corner of the pull request page we must request review from our colleague
+	- the colleague review the code, resolve conflicts if any, approve our pull request and commit merge
+
+Same as other roles
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
