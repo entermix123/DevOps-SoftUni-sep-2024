@@ -1,148 +1,485 @@
-Postman and Newman
+I. Postman and Newman
 
-We can import requests from Collections/Import. We must import env variables from Environments/Import.
-Choose environments from top right corner in request window. We can also save the variables in every request 'params' page.
+We can create new collection.
+	- let side of the screen / Collections / New / Collection
 
-Set Trello with file - Trello-Autohorization - word file
+We can import requests from 	
+	- Collections / Import / File
+	- Load file TrelloAPIFinalCollection.postman_collection from resources
 
-We can start all requests by right clicking on the collection and set parameters for manual start - 'run collection' button. 
+We can see variables as
+	- click on TrelloAPIFinalCollection (loaded collection) / Variables
 
-We can set automatic test start at specific time as:
-	Iterations - 1
-	delay - 0.5 - delay between requests executing
+Set variables:
+	- Envirnments / Import / File
+	- choose Trello.postman_environment.json from resources
+
+Register in Trello - https://trello.com/
+	- got to https://trello.com/power-ups/admin
+	- create workspace if not have one
+	- got to https://trello.com/power-ups/admin again
+	- create New Power-Up or Integration
+		- New Power-Up or Integration: Postman
+		- Workspace: choose your workspace
+		- Iframe connector URL (Required for Power-Up): https://api.trello.com/
+		- Email: your email address
+		- Support contact: another email address
+		- Author: your name
+		- click 'Create' button
+
+	- Go to API key
+		- click 'Generate a new API key' button
+		- confirm generation
+
+		- Copy API key and Secret
+			- API key: key
+			- Secret:  secret	// secret is not used in this task
+
+		- click on 'Manually generate a Token' link right from API key field
+		- allow permission to Postman
+			- generated token: token
+			- save the token somewhere safe
+
+We can set Variables for specific collection in Postman
+	- Open Postman and import collection
+	- click on the chosen collection in Postman
+		- go to Variables tab and add all needed variables
+
+			- Variable: baseURL	
+			- Initial value: https://api.trello.com
+			- Current value: https://api.trello.com
+
+			- Variable: trelloKey	
+			- Initial value: generated API Кey
+			- Current value: generated API Кey	
+
+			- Variable: trelloToken	
+			- Initial value: generated API Token
+			- Current value: generated API Token
 
 
-We can install Postman CLI from - 16 min from video
+-----------------------------
+MANUAL API TESTING IN POSTMAN
+-----------------------------
 
-!!!!!
+Now we can send manual request from the collection
+	- GET / Get All Boards / Send
+	- in the results tab - bottom window, we have Test Result Tab (3/3)
 
+We can see the tests in Request / Scripts tab we can see the tests
+	- fix the Create TO DO list test, because is not working
+	- open the POST Create TO DO list / Scripts and add line 8
+-----------------------------------------------------------------------
+pm.expect(responseData).to.have.all.keys('id', 'name', 'closed', 'color', 'idBoard', 'pos','type', 'datasource', limits');
+-----------------------------------------------------------------------
+
+--------------------------------
+AUTOMATED API TESTING IN POSTMAN
+--------------------------------
+
+Click on the collection and got to 'Runs' tab and click 'Run Collection' button
+	- We have few options
+		- Run manually
+		- Schedule runs
+		- Automate Runs via CLI
+
+Run manually
+	- iterations: 1		// how many times the tests will run
+	- Delay: 0		// set delay for data receiving
+
+Schedule Run
+	- set name
+	- set period
+	- set environment
+	- set iterations (usually 1)
+	
+Automate runs via CLI
+	- install Postman CLI  - https://learning.postman.com/docs/postman-cli/postman-cli-installation/#windows-installation
+	power shell terminal --> powershell.exe -NoProfile -InputFormat None -ExecutionPolicy AllSigned -Command "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://dl-cli.pstmn.io/install/win64.ps1'))"
+	
+	- in Postman / Runner / Functional, click on 'Add API Key' button / Generate Key
+		- enter name / click generate key
+		- click 'Insert Key' button
+		- copy commands from field 'Copy this command and run it in your local terminal.'
+		- save it somewhere safe
+
+Login command
+-----------------------------------------
+terminal --> postman login --with-api-key PMAK-xxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-----------------------------------------
+
+Run collection command
+-----------------------------------------
+terminal --> postman collection run xxxxxxxxx-xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx
+-----------------------------------------
+
+Run collection with file
+-----------------------------------------
+terminal --> postman collection run <collection_file.json>
+-----------------------------------------
+
+!!! with Postman CLI we CANNOT use environment variables but full strings !!!
+
+Some useful commands for Postman CLI:
+	• postman login
+	• postman logout
+	• postman collection run {collection id}
+	• postman collection run {collection URL}
+	• postman collection run {JSON file}
+
+Some additional options for the postman collection run command
+	terminal --> --bail option → stops the collection from running immediately if any test fails (works or collection id, collection URL and JSON file)
+	terminal --> --delay-request [number] → specifies a delay (in milliseconds) between requests
+	terminal --> -i [requestUID] or [folderUID] → Runs only the specified folder UID or request UID from the collection
 
 Set Postman CLI and run tests - we can't set environment variables with postman CLI !!!
 With Postman we can run test with details with Postman UI.
 
+
+
 ======
-Newman - postman CLI advanced
+Newman - Advanced CLI API Testing
 ======
 
-Execute of tests with CLI
+Requirements
+	- install node.js - https://nodejs.org/en
+	- check if node is installed
+		terminal --> node -v		
 
-Install NEWMAN:
-1. install node.js 			// https://nodejs.org/en/download/package-manager
-2. terminal --> npm install -g newman	// -g - global
+Install NEWMAN
+	terminal --> npm install -g newman	// -g - global
+	- check if successfully installed
+	terminal --> newman -v
 
-Start collection with newman:
-	terminal --> newman run <coolection_name> -e <evironemnt_file>
+Run collection with newman:
+	- run collection, navigate to folder
+	terminal --> newman run <coolection_name>
+	
+	- run collection with environment file
+	terminal --> newman run <coolection_name> -e <evironemnt_file>		// -e - environment file
 
-Install Reporter:
+Install Reporter - https://www.npmjs.com/package/newman-reporter-htmlextra
 	terminal --> npm install -g newman-reporter-htmlextra
 	
-Start collection with newman with reporter:
+Run collection with newman with reporter:
+	- navigate to folder with collection and environment file
+
 	terminal --> newman run <coolection_name> -e <evironemnt_file> -r htmlextra
 	- new html file with the report is generated in the collection folder with htmlextra.
 
-	terminal --> newman run .\TrelloAPIFinalCollection.postman_collection.json -e <evironemnt_file> -r "cli,htmlextra"
+	- run collection with collection path, env file and in CLI
+	terminal --> newman run TrelloAPIFinalCollection.postman_collection.json -r "cli,htmlextra"
+	
+	- run collection with collection path, env fiel in CLI
+	terminal --> newman run TrelloAPIFinalCollection.postman_collection.json -e <evironemnt_file> -r "cli,htmlextra"
+
+	- report files are generated in the folder with the collection !
 
 
-Grafana K6 Oen Source for load tests
+Grafana K6 Open Source for load tests - https://k6.io/
 
 
-========
-Selenium - testing UI  - we can install add on for browser - search for 'Selenium IDE'
-========
+=======================
+III. Selenium WebDriver - testing UI
+=======================
 
-Install MC VS
+We can install add-on for browser - open extensions/chrome web store and search for 'Selenium IDE'
+
+How to create test for specific case:
+Start Selenium IDE
+	- click o the extension
+	- click Record a new  test in a new project
+		- set project name
+		- set url
+
+	- if we want to check for specific text:
+		- maximize the page
+		- navigate to the wanted page
+		- select the text
+		- right click / Selenium IDE / Assert / Text
+		- close the browser
+		- set test name
+
+	- now we can execute the test again with play button
+	- we can export the test to specific programming language
+		- export test
+		- choose programming language
+		- click export
 
 
-set project name
-set url - open page / select text / right click text/assert
-We can export the test to chosen program language.
+Install Microsoft Visual Studio - https://visualstudio.microsoft.com/downloads/
+
+Open course resources / 02-SeleniumIDE / SeleniumIde.sln
+
+Open project 2-SeleniumIDE/SeleniumIde.sln with MS Visual Studio
+	- We can visualize the tabs tab
+		- main menu / Test / Run All Tests
+
+Update package manager with required:
+	- right click on solution / Manage NuGet Packages for solution
+	- Go to Update tab
+	- check 'Select all packages' checkbox
+	- Update
+
+Start tests manually
+	- in Test Explorer on left side of the screen click 
+	- Run (Play button)
 
 
-Open tests for selenium in MS VS
+Run automatically test  from Package Manager Console
+	- Add Package Manager Console
+		- main menu / Views / Other Windows / Package Manager Console
+		- the console is placed in bottom left tab
+	- open package manager console
+		- build solution
+		terminal --> dotnet build
+		- error occur and we have to add 
+			line 33 - driver.Dispose();
 
-Update package anager with required:
-	- right click on solution / NuGet / update package
-
-Run test from MS VS console - Package Manager Console
-
-terminal --> dotnet buid
-terminal --> dotnet test
+		- build solution again
+			terminal --> dotnet build
+	- start test
+		terminal --> dotnet test
 
 
 ===================
-Selenium Web Driver - 
+Selenium Web Driver
 ===================
 
-Open test project
+Open test project 3-SeleniumWevDriver/SeleniumBasicExercise.sln from course resources.
 
-	- right click on solution / NuGet / update package
-	terminal --> dotnet build
-	terminal --> dotnet test
+	Update packages 
+		- right click on solution
+		- Manage NuGet Packages fro Solution 
+		- Go to 'Update' tab and check 'Select all packages' checkbox 
+		- Cklick 'Update' button
 
+	Build the solution
+		- in Search Solution Explorer (top right windows), right click on Solution / Build Solution
+		- errors will appear
+			- in file TestProject1/TestCalculatior.cs add
+				- line 39 'driver.Dispose();'
+			- in file TestProject2/Table.cs add
+				- line 68 'driver.Dispose();'
+				- replace line 59 and 60 with:
+					- Assert.That(File.Exists(path), Is.True, "CSV file was not created");
+					- Assert.That(new FileInfo(path).Length > 0, Is.True, "CSV file is empty");
+			- in file TestProject3/DropDown.cs
+				- line 34 - 32 add
+				--------------------------
+        			[TearDown]
+
+        			public void TearDown()
+        			{
+            			// Quit the driver
+            			driver.Quit();
+            			driver.Dispose();
+        			}
+				--------------------------
+
+				- remove line 85 - 87 
+				--------------------------
+            			// Quit the driver
+            			driver.Quit();
+            			driver.Dispose();
+				--------------------------
+
+		- test to build solution again	
+			- in Search Solution Explorer (top right windows), right click on Solution / Build Solution
+
+		- start tests
+			- in Test Explorer (top left window) start all tests
+
+		- start tests from terminal
+			- open Package Manager Console
+			- main menu / Views / Other Windows / Package Manager Console
+			- the console is placed in bottom left tab
+				terminal --> dotnet test
+
+		- build the solution from terminal
+			- open Package Manager Console
+			- main menu / Views / Other Windows / Package Manager Console
+			- the console is placed in bottom left tab
+				terminal --> dotnet build
 
 ==========
-Playwright
+Playwright - Automated tests for JS
 ==========
 
-terminal --> npm install
-terminal --> npm install -D @playwright/test
-terminal --> npx playwright install
-terminal --> npm run start
-terminal --> npm run server
-terminal --> npm run test
-terminal --> npm run test --ui 		// execute test with ui
-terminal --> npx mocha api.test.js
-terminal --> 
+Install Visual Studio Code - https://code.visualstudio.com/
+
+Open 4-Playwright/Library project from course resources
+	- navigate to project folder
+	- right click / open with Code
+		or
+	- right click / open in terminal
+		terminal --> code .
+
+	- install required packages
+		terminal --> npm install			// install project packages
+		terminal --> npm install -D @playwright/test	// install automated test runner package - https://playwright.dev/
+		terminal --> npx playwright install		// install browser packages
+
+	- start the project - in package.json we can see all created scripts
+		- start server
+			terminal --> npm run server
+		- start front-end
+			new terminal --> npm run start
+		- test app on http://localhost:3000/ in browser
+
+	- Good practice is to rename all terminal with names they are used for.
+		- server, front-end, tests etc.
+
+	- Change port if used, and we have to change it
+		- Ctrl + Shift + F
+		- search for '3000' and replace with wanted port
+
+	- how to set test in Postman when app is running
+		- open Postman
+		- create new Request tab
+		- send GET request to http://localhost:3030/data/books
+			- response must be successful with status 200 and data for all books
+		- create test fir GET request
+			- open 'Scripts' tab on the request page
+			- on the right side find 'Response body: Contains String'
+			- change the string on line 2 with 'A Court of Thorns and Roses' - one of books title
+			- click 'Send' button again
+			- on Test Results (1/1) tab we can see the test status 
+
+Create tests for get and post request
+	- Login to receive access token
+		- create test fot POST request
+			- Login with POST request to http://localhost:3030/login
+			- on Body/ raw / JSON add
+			--------------------------
+			{
+			    "email": "peter@abv.bg",
+			    "password": "123456"
+			}
+			--------------------------
+			- Click 'Send' button
+		- after successful login copy Access token value
+			example:
+			"accessToken": "fa95fdc44e0747154314c1fe1859ed66d2a92aca0de9fcad5c703c1f0abae66e"
+
+	- Create book
+		- create new request tab and choose 'POST' request to http://localhost:3030/data/books
+			- on Headers tab add
+				- Key: "X-Authorization"
+				- Value: 'token_value'
+
+			- on Body / raw / JSON tab add
+			--------------------------
+			{
+				"title": "Danio's new book",
+				"description": "Danio's book description - very nice",
+				"imageurl": "https://edit.org/images/cat/book-covers-big-2019101610.jpg",
+				"type": "Fiction"
+			}
+			--------------------------
+			- Click 'Send' button
+
+			- The result must be successfully created a book
+			- We can check that with GET request to http://localhost:3030/data/books
 
 
-Integration tests:
-
-MS VS
-
-1. Open Project/Solution/Build
-
-2. Build : terminal --> dotnet build
-
-3. Start tests : terminal --> dotnet test
-
-4. 
+	- run test from in headless mode or debug mode
+		- in package.json file change
+			- line 9 "test": "playwright test --ui"		// for headless mode
+			- line 9 "test": "playwright test --debug"	// for debug mode
+		new terminal --> npm run test
+			- if ui mode ,we have to start the tests
+			- if debug mode, we have to click nex step with button or F10
 
 
+===========
+API Testing
+===========
+
+Install Visual Studio Code - https://code.visualstudio.com/
+
+Open 5-API-JS/Books project from course resources
+	- navigate to project folder
+	- right click / open with Code
+		or
+	- right click / open in terminal
+		terminal --> code .
+
+	- install packages
+		terminal --> npm install
+
+	- we can start the server
+		terminal --> node server.js
+		- we can check if server is running by sending a GET request in Postman to http://localhost:3002/books
+		- the result must be empty list
+
+		- we can create a book by sending POST request in Postman to http://localhost:3002/books
+			- body / raw / JSON
+		---------------------------------
+		{
+			"id": "100",
+			"name": "devops"
+		}
+		---------------------------------
+
+		- we can check if created book by sending a GET request in Postman to http://localhost:3002/books again
+		- the result must be list with the created book
+		- stop the server
+			server terminal --> Ctrl + C
+
+Start automated testing - mocha, assertion library - chai
+		- packages are already installed in the beggining with 'npm install' command
+
+		- in server.js replace line 46 with the code below to stop testing process after execution:
+		-------------------------------------------
+		if (require.main === module) {
+		    server.listen(3002, () => console.log('Server is up and running'));
+		}
+		-------------------------------------------
+		
+		- start the tests
+			terminal --> npx mocha api.test.js
+
+		- in package.json add:
+		-------------------------------------------
+		{
+ 		 "dependencies": {
+		  "body-parser": "^1.20.2",
+		  "chai": "^4.3.7",
+		  "chai-http": "^4.4.0",
+ 		  "express": "^4.18.2",
+		  "mocha": "^10.2.0"
+		  },
+
+		  "scripts": {
+		    "test": "npx mocha api.test.js"
+ 		 }
+		}
+		-------------------------------------------
+
+		- start the tests
+			terminal --> npm run test
 
 
 
+=================
+Integration tests - MS Visual Studio
+=================
 
+Install Microsoft Visual Studio - https://visualstudio.microsoft.com/downloads/
 
+Open course resources / 6-Integration-NET / LibroConsoleAPI/ LibroConsoleAPI.sln
 
+	Update packages 
+		- right click on solution
+		- Manage NuGet Packages fro Solution 
+		- Go to 'Update' tab and check 'Select all packages' checkbox 
+		- Cklick 'Update' button
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	Build the solution
+		- in Search Solution Explorer (top right windows), right click on Solution / Build Solution
+		or
+		Package Manager Console terminal --> dotnet buid
+	Start tests
+		Package Manager Console terminal --> dotnet test
 

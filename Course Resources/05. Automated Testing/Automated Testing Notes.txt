@@ -328,6 +328,100 @@ Selenium Family
 LIVE DEMO
 ===========================================================
 
+1. Bug Tracking Tools
+You can checkout the links below and take a look at how bugs are tracked in real projects:
+• https://github.com/twbs/bootstrap/issues
+• https://github.com/twbs/bootstrap/issues/31392
+• https://daosio.atlassian.net/jira/software/c/projects/CART/issues
+
+Install Visual Studio - https://visualstudio.microsoft.com/downloads/
+Install .NET and other required requirements when open the project - 2-TownsApplication from the resources
+
+2. Integration Testing
+Open lab project 2-TownsApplication from resources.
+
+On right side Solution Explorer must be visualized. 
+	- Right click on solution 2/2 / Build Solution : Ctrl + Shift + B
+
+Open Test Explorer - Main Menu / Test / Test Explorer
+	- Run All Tests
+
+Open Package manager CLI - Main Menu / Views / Other Windows / Package Manager Console
+	terminal --> Install-Package xunit				// install required package
+	terminal --> Install-Package xunit.runner.visualstudio		// install required package
+	- start tests from CLI
+	terminal --> dotnet test
+	
+	- This steps must be implemented in CI/CD later in the course
+
+
+
+3. Swagger
+
+Open project 3-BooksApi and open BooksApi.sln with Visual Studio.
+
+On right side Solution Explorer must be visualized. 
+	- Right click on solution 3/3 / Build Solution : Ctrl + Shift + B
+
+Start Books.Api and play with Swagger
+
+
+4. Web UI Testing
+
+Open project To-Do app with VSCode.
+
+Open terminal and install required packages and playwright test
+	terminal --> npm install			// install app packages
+	terminal --> npm install @playwright/test	// install playwright test package
+	terminal --> npx playwright install		// install browser packages - Chromium, Firefox and WebKit
+
+Start the app and run tests
+	terminal --> npm start				// start the app
+	new terminal --> npx playwright test		// run tests
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 FORKING
 - when we fork repo and original repo is updated we can manually sync the changes. If pull request is opened with the original repo, the sync is made automatically.
 
