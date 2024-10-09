@@ -1,0 +1,1170 @@
+Download the resources on desktop to avoid long path error from MS Visual Studio.
+
+=======================================
+1. CI Workflow – "Student Registry" App
+=======================================
+
+Install VS Code - https://code.visualstudio.com/
+	- install 'GitHub Actions' extension
+		- go to extensions tab in VS Code
+		- Search 'github actions' and install the package
+
+Open the project in VS Code
+	- navigate to project directory
+	- right click / Open with Code
+		or 
+	- right click open in terminal
+		terminal --> code .
+
+Install dependencies
+	- open terminal - main menu / terminal
+	terminal --> npm install
+
+Upload project in GitHub
+	- open VS Code GitHub extension tab and click on "Initialize Repository"
+
+Add .gitignore file to project folder and add 'node_modules'
+
+Stage and push project files to GitHub
+	terminal --> git add .
+	terminal --> git commit -m 'repo init'
+	- publish the project  from VS Code GitHub tab 
+		- press button 'Publish Branch'
+		- choose type public repository
+	- the repo is now published
+
+Start the app in VS Code
+	terminal --> npm run start
+	- we can open the project on http://localhost:8080
+
+Start tests in VS Code
+	new terminal --> npm run test
+
+
+---------------------------------------------------
+Create workflow for this projects in GitHub Actions
+---------------------------------------------------
+
+We can set workflow two ways:
+
+Manual - add folder .github/workflows and add file workflow_name.yml 
+
+
+---------
+Automatic
+---------
+Go to the project GitHub repo and navigate to Actions tab
+	- search for 'Node.js' and press 'Configure' button
+
+!!! BUILD СТЕP IS EXECUTED ON EVERY JОB, SO IF POSSIBLE WE MUST COMBINE THE BUILD JOB WITH OTHER JOBS TO SAVE RESOURCES !!!
+
+rename node.js.yml to whatever name you want to use for this workflow, in this case test_pipeline.yml
+
+test_pipeline.yml
+---------------------------------------------------
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        # step 1
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              # step 2
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: install dependencies                     # step 3
+      run: npm install
+    - name: execute tests                            # step 4
+      run: npm test
+    - run: npm ci                                    # step 5
+    - run: npm run build --if-present                # step 6
+    - name: Execute tests			     # step 7
+      run: npm run test                              
+---------------------------------------------------
+
+If we work on GitHub.com platform we have to commit changes
+Press Ctrl + S or 'Commit Changes' button in top right side of the windows
+	- confirm commit by pressing "Commit Changes" button
+
+On Code Tab we can see orange dot or green check mark. This means that the repo have workflow
+On Actions Tab we can see the workflow and go in details
+
+Update the project locally in VS Code from GitHub repo
+	terminal --> git pull
+	- folder .github/workflow will appear with file test_pipeline.yml
+
+
+-----------------------------------
+Simulate work on repo with workflow
+-----------------------------------
+Create branch in VS Code
+	terminal --> git checkout -b fix-issue
+
+Make some changes in VS Code
+	- in views/about.pug change string on line 4 - "Students Registry" to "DevOps"
+	- in views/add-student.pug change h1 on line 3 - "Register New Student" to "Register New DevOps Student"
+
+Stage, commit and publish the branch
+	terminal --> git add .					// stage
+	terminal --> git commit -m "small change added"		// commit
+	terminal --> git push -u origin fix-issue		// publish branch with up-stream on remote repo
+
+Remainer:
+Events in test_pipeline.yml are set only for main branch. Publishing different branch DO NOT trigger the workflow.
+---------------------------------------------------
+name: Build and Test
+
+on:
+  push:				// on push to main branch
+    branches: [ "main" ]
+  pull_request:			// on pull request to main branch
+    branches: [ "main" ]
+....
+---------------------------------------------------
+
+Create a Pull Request to trigger the workflow, because events are connected only to 'main' branch. 
+	- go to GitHub / Pull requests tab and create pull request to 'main' branch
+
+Error for failed test will appear. We can see details on "Pull request" tab.
+
+We can still merge the changes because of lack of rules for the main branch.
+
+We can add rule for this branch
+	- go to Settings / Branches / Add classic branch protection rule
+	- set field 'Branch name pattern': main
+	- check 'Require status checks to pass before merging' checkbox			
+		- in the search field write 'build_test' and confirm the choice		// set our workflow
+	- if check 'Do not allow bypassing the above settings' checkbox		
+	// we need success of the workflow to merge the PR as repo owner and administrator
+	- Click 'Create' button to create the rule
+
+In Pull request / 'small change added' we can see details for PR status.
+
+We CAN NOT merge because failed test error and the rule we made
+
+We can fix the test that fails in VS Code.
+In add-student.js on line 8 set 
+--------------------------------------------------
+    assert.ok(body.includes("<h1>Register New DevOps Student</h1>"));
+--------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Stage, commit and push the change to remote branch 'fix-issue'
+	terminal --> git commit -a -m "fixed failing test"		// stage, commit in one line
+	terminal --> git push						// push changes to remote repo
+
+Now the workflow is triggered, because we have opened Pull request from branch 'fix-issue' to 'main' branch.
+
+Merge the Pull request, because the result of the workflow is successful and we are allowed.
+
+
+-------------------------------
+Adding a matrix to the workflow	- test if the code is running on different Node.js versions
+-------------------------------
+
+Move to main branch and update it in VS Code
+	terminal --> git checkout main
+	terminal --> git pull		// sync changes with remote 'main' branch
+
+Remainder: Asking VS Code to suggest code - 'Ctrl + Space'
+Change test_pipline.yml adding strategy:
+---------------------------------------------------
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+
+    strategy:					# set matrix strategy for different Node.js versions
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - name: Checkout the code                        # step 1
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              # step 2
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}     # set execute the job for all version in the matrix
+    - name: install dependencies                     # step 3
+      run: npm install
+    - name: execute tests                            # step 4
+      run: npm test
+    - run: npm ci                                    # step 5
+    - run: npm run build --if-present                # step 6
+    - name: Execute integration tests		     # step 7
+      run: npm run test                               
+---------------------------------------------------
+Save changes - 'Ctrl + s'
+
+We can also set different job for each version if needed
+
+Stage, commit and push changes
+	terminal --> git commit -a -m "added strategies"
+	terminal --> git push
+
+Delete the rule we created if needed to push to main
+	- Go to GitHub repo / Settings / Branches / Delete the rule
+
+Now in GitHub repo / Actions we can see 3 jobs are running in parallel.
+
+
+Add options to start the workflow manual 
+in test_pipline.yml add
+---------------------------------------------------
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    workflow_dispatch: 		// added for manual triggering the work flow
+...
+---------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Asking VS Code to suggest code - 'Ctrl + Space'
+
+Stage, commit and push the change
+	terminal --> git commit -a -m "added manual workflow trigger"	// stage, commit in one line with message
+	terminal --> git push						// push changes to remote repo
+
+Now in remote repo / Actions / Build and Test tab we can start the flow manually.
+	- Manual triggered runs are named as the name of the workflow
+
+
+-------------------
+Add second workflow
+-------------------
+
+create .github/workflows/test_pipeline2.tml
+-------------------------------------------------
+name: Deployment
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+-------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Change test_pileline.yml as - remove the strategy matrix
+-------------------------------------------------
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build_test:					# job 2
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                       
+      uses: actions/checkout@v4      
+    - name: Set Node.js                             
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+    - name: execute tests                            
+      run: npm test
+    - run: npm ci                                    
+    - run: npm run build --if-present                
+    - name: Execute integration tests			           
+      run: npm run test   
+-------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Stage, commit and push the change to remote branch 'fix-issue'
+	terminal --> git add .					// stage file
+	terminal --> git commit -m "added second workflow"	// commit
+	terminal --> git push						// push changes to remote repo
+
+Now we have second workflow and we can see the execution in GitHub / Actions
+
+
+----------------------------------------------------------------------
+Separate build and test actions in different jobs executed in parallel
+----------------------------------------------------------------------
+
+in test_pipline.yml add
+---------------------------------------------------
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:				# job 1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+
+  test:					# job 2
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                       
+      uses: actions/checkout@v4      
+    - name: Set Node.js                             
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+    - name: execute tests                            
+      run: npm test
+    - run: npm ci                                    
+    - run: npm run build --if-present                
+    - name: Execute integration tests			           
+      run: npm run test   
+---------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Delete test_pileline2.yml to remove the second workflow
+
+Stage, commit and push the change
+	terminal --> git commit -a -m "separated jobs and delete deployment pipe"	// stage, commit in one line with message
+	terminal --> git push						// push changes to remote repo
+
+In GitHub / Action We can see the execution of only one workflow with 2 jobs in parallel
+
+
+-----------------------------------------------------------------------
+Separate build and test actions in different jobs executed sequentially
+-----------------------------------------------------------------------
+
+If we want to execute jobs one after another we need to specify this in the workflow
+
+Remainder: Asking VS Code to suggest code - 'Ctrl + Space'
+
+in test_pipline.yml add
+---------------------------------------------------
+name: Build-Start-Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+
+  start_test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout the code                       
+      uses: actions/checkout@v4      
+    - name: Set Node.js                             
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+    - name: start  app                
+      run: npm run start &
+    - name: execute tests                            
+      run: npm test
+    - run: npm ci                                    
+    - run: npm run build --if-present                
+    - name: Execute integration tests			           
+      run: npm run test   
+---------------------------------------------------
+Save changes - 'Ctrl + s'
+
+!!! Important !!!
+'&' after action or script make it run in background and do not block the terminal for next script
+
+Stage, commit and push the change
+	terminal --> git commit -a -m "set jobs sequentially and start the app in background mode"	// stage, commit in one line with message
+	terminal --> git push						// push changes to remote repo
+
+In GitHub / Action We can see the execution of only one workflow with 2 jobs sequentially
+
+If we have endlessly working actions, we can cancel them in GitHub / Actions manually
+
+
+
+=======================================
+2. CD Workflow – "Student Registry" App
+=======================================
+
+Got to https://render.com/ - PAAS - platform as a service
+	- login with GitHub account or create new account with email and password
+	!!! CHOOSE CHOOL ACCOUNT !!! - free resources do not require payment card
+
+Create new deploy
+	- Dashboard / + New / Web Service
+	- install git provider if not installed  // we can also connect 'Public Git Repository'
+	- choose the repo 01-02-Student-Registry-App or set url to the repo
+	- click 'Connect' button
+
+Set Project params
+	- Name: StudentRegistryApp
+	- Language: Node			// programming language
+	- Branch: main				// choose branch
+	- Region: Oregon (US West)		// free
+	- Root Directory: 			// empty for this project
+	- Build Command: npm install
+	- Start Command: npm run start
+	- Instance Type: Free $0/month
+	- click 'Deploy Web Service' button
+
+Disable auto deploy, because we want to work with our workflow
+	- go to Dashboard / StudentRegistryApp / Settings / Auto-Deploy - No / Save
+
+When the app finish building, url will appear below the project title. We can open it and see that the App is live. 
+
+On Dashboard Page we have button 'Manual Deploy' for changes
+
+Make a change in VS Code
+in student-controller.js change line 5 to:
+-------------------------------
+      msg: "Students Registry",
+-------------------------------
+Save changes - 'Ctrl + s'
+
+in home.test.js change line 8 to
+---------------------------------------------------------
+    assert.ok(body.includes("<h1>DevOps Registry</h1>"));
+---------------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Stage, commit and push the change to GitHub
+	terminal --> git commit -a -m "update title"	// stage, commit in one line with message
+	terminal --> git push						// push changes to remote repo
+
+On render.com access the deploy and click on the button 'Manual Deploy' / Deploy Latest Commit
+
+
+------------------------------------
+Add CD - Deploy step in the workflow 
+-------------------------------------
+
+Add step in the workflow in VS Code 
+	- search in Google for 'GitHub action render deploy'
+		- https://github.com/marketplace/actions/render-deploy-action
+
+	- also remove start app step
+	
+
+
+in test_pipeline.yml add
+---------------------------------------------------
+name: Build-Start-Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout the code                       
+      uses: actions/checkout@v4      
+    - name: Set Node.js                             
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+    - name: execute tests                            
+      run: npm test
+    - run: npm ci                                    
+    - run: npm run build --if-present                
+    - name: Execute integration tests			           
+      run: npm run test
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Deploy to production
+        uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.MY_RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait_deploy: true 
+---------------------------------------------------
+Save changes - 'Ctrl + s'
+
+Set variables (secrets) for render.com in the workflow file
+	- ${{ secrets.MY_RENDER_SERVICE_ID }}
+	- ${{ secrets.MY_RENDER_API_KEY }}
+
+---------------
+Find Service ID
+---------------
+Got to render.com / Dashboard / 01-02-Student-Registry-App / Settings
+	- find Deploy hook and copy it - this url trigger deploy on render.com
+	- we need only the code shown below
+	- srv-cs1dhtq3esus739e04i0
+
+Example for full url and what we need in quotes
+	https://api.render.com/deploy/ 'srv-cs1dhtq3esus739exxxx' ?key=QY_bvKSzdi4
+
+-------------------
+Find RENDER_API_KEY
+-------------------
+Find second variable we need - MY_RENDER_API_KEY
+	- go to render.com / User / Account Settings / API Keys / Create API Key
+		- set name: GitHubDemoApiKey
+		- copy the key and save it
+
+Create new file in VS Code project named pipe_vars.txt and add it to .gitignore file
+---------------------------------------------------
+MY_RENDER_SERVICE_ID: srv-cs1dhtq3esus739exxxx
+MY_RENDER_API_KEY: rnd_UGi3nR3hJuY7Ab96Qi0Jofkvxxxx
+---------------------------------------------------
+
+If  GitHub / Actions / Deploy / Deploy to production
+	- Response received: 201 is OK
+	- Response received: 401 or 403 - we have problems with the secrets
+	
+
+---------------------
+Set Secrets in GitHub
+---------------------
+
+Go to GitHub Repo / Settings / Secrets and variables / Actions
+	- in field 'Repository secrets' click 'New repository secret'
+	- set Name: MY_RENDER_SERVICE_ID
+	- set Secret: srv-cs1dhtq3esus739exxxx
+	- click 'Add secret' button
+
+	- repeat for the second variable
+	- in field 'Repository secrets' click 'New repository secret'
+	- set Name: MY_RENDER_API_KEY
+	- set Secret: rnd_UGi3nR3hJuY7Ab96Qi0Jofkvxxxx
+	- click 'Add secret' button
+
+Delete pipe_vars.txt from the VS Code project and DO NOT push secrets to the remote repo !!!
+
+Stage, commit and push the change to GitHub
+	terminal --> git commit -a -m "render deploy"			// stage, commit 
+	terminal --> git push						// push changes to remote repo
+
+In GitHub / Actions , we can see that jobs are executed and after finish of the last one (deploy) in render.com we can see that new deploy is started.
+
+
+
+===========================
+04-House-Renting-System-App
+===========================
+
+Open the project 04-House-Renting-System-App in MS Visual Studio
+
+Try to Build the projects
+	- right click on solution / Build
+
+If not Build successfully, update packages
+	- right click on solution / Manage NuGet Packages for solution
+	- Go to Update tab
+	- check 'Select all packages' checkbox
+	- Update
+
+Try to Build the projects again
+	- right click on solution / Build
+
+Start tests manually
+	- in Test Explorer on left side of the screen click 
+	- Run (Play button)
+
+Try to Build from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+		terminal --> dotnet build
+
+Start tests from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+	- the console is placed in bottom left tab
+		terminal --> dotnet test
+
+
+Create GitHub repository for the projects
+	1. Add 'bin' and 'obj' folders from the projects to .gitignore
+		- create .gitignore file in the same directory as project are and add
+		---------------------------------------------------
+		.vs/
+		HouseRentingSystem.Services/bin/
+		HouseRentingSystem.Services/obj/
+		HouseRentingSystem.Tests/bin/
+		HouseRentingSystem.Tests/obj/
+		HouseRentingSystem.Web/bin/
+		HouseRentingSystem.Web/obj/
+		---------------------------------------------------
+
+	2. Initialize repository
+		- open terminal and navigate to the projects
+		- initialize repository
+			terminal -- git init
+			terminal --> git status
+
+		- stage and commit the projects
+			terminal --> git add .
+			terminal -- git commit -m 'git init'
+
+		- create public repository in GitHub named HouseRentingSystem
+			- copy the repository url
+
+		- connect local repository to remote repository 
+			terminal --> git remote add origin repository_url
+
+		- create remote 'main' branch and connect it with local 'main' branch
+			terminal --> git push -u origin main
+
+		- show branch details			# optional check
+			terminal -- git branch -vv
+			- we have to receive message like 'main b447000 [origin/main] repo init'
+
+In GitHub add Workflow to the repo using marketpalce 
+	- go to the project GitHub repo and navigate to Actions tab
+		- search for '.net'
+		- choose workflow: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+		- press 'Configure' button
+
+build_test.yml
+---------------------------------------------------
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    
+    - name: checkout the code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity quiet
+
+----------------------------------------------------
+- commit changes and go to GitHub repo / Actions
+	- we can see that the workflow is running and should pass successfully
+
+
+
+
+==============
+05-SeleniumIDE
+==============
+
+Open project in MS Visual Studio
+
+Try to Build the projects
+	- right click on solution / Build
+
+Try to Build from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+		terminal --> dotnet build
+
+Start tests manually
+	- in Test Explorer on left side of the screen click 
+	- Run (Play button)
+
+- will accur error with chrome browser
+
+Update packages
+	- right click on solution / Manage NuGet Packages for solution
+	- Go to Update tab
+	- check 'Select all packages' checkbox
+	- Update
+
+Fix code:
+In TC01IfUserIsInvalidTryAgainTest1.cs as line 21-41 add 
+---------------------------------------------------------
+    [SetUp]
+    public void SetUp()
+    {
+        ChromeOptions options = new ChromeOptions();
+        options.AddArguments("headless");
+        options.AddArguments("no-sandbox");
+        options.AddArguments("disable-dev-shm-usage");
+        options.AddArguments("disable-gpu");
+        options.AddArguments("windows-size=1920x1080");
+
+        driver = new ChromeDriver(options);
+        js = (IJavaScriptExecutor)driver;
+        vars = new Dictionary<string, object>();
+    }
+
+    [TearDown]
+    protected void TearDown()
+    {
+        driver.Quit();
+        driver.Dispose();
+    }
+---------------------------------------------------------
+
+Try to Build from terminal again
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+		terminal --> dotnet build
+
+Start tests from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+	- the console is placed in bottom left tab
+		terminal --> dotnet test
+
+Create GitHub repository for the projects
+	1. Add 'bin' and 'obj' folders from the projects to .gitignore
+		- create .gitignore file in the same directory as project are and add
+		---------------------------------------------------
+		.vs/
+		SeleniumIDE/bin/
+		SeleniumIDE/obj/
+		---------------------------------------------------
+
+	2. Initialize repository
+		- open terminal and navigate to the projects
+		- initialize repository
+			terminal -- git init
+			terminal --> git status
+
+		- stage and commit the projects
+			terminal --> git add .
+			terminal -- git commit -m 'git init'
+
+		- create public repository in GitHub named HouseRentingSystem
+			- copy the repository url
+
+		- connect local repository to remote repository 
+			terminal --> git remote add origin repository_url
+
+		- create remote 'main' branch and connect it with local 'main' branch
+			terminal --> git push -u origin main
+
+		- show branch details			# optional check
+			terminal -- git branch -vv
+			- we have to receive message like 'main b447000 [origin/main] repo init'
+
+In GitHub add Workflow to the repo using marketpalce 
+	- go to the project GitHub repo and navigate to Actions tab
+		- search for '.net'
+		- choose workflow: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+		- press 'Configure' button
+
+build_test.yml
+---------------------------------------------------
+name: Selenium IDE CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: build
+      run: dotnet build --no-restore
+
+    - name: run tests
+      env:
+        CHROMEWEBDRIVER: /usr/bin/google-chrome
+      run: dotnet test -- verbosity normal
+----------------------------------------------------
+- commit changes and go to GitHub repo / Actions
+	- we can see that the workflow is running and should pass successfully
+
+
+
+
+====================
+06-SeleniumWebDriver
+====================
+
+Open project in MS Visual Studio
+
+Try to Build the projects
+	- right click on solution / Build
+
+Start tests
+	- in Test Explorer on left side of the screen click 
+	- Run (Play button)
+	- must accur with chrome browser
+
+Update packages
+	- right click on solution / Manage NuGet Packages for solution
+	- Go to Update tab
+	- check 'Select all packages' checkbox
+	- Update
+
+Try to Build from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+		terminal --> dotnet build
+
+Start tests from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+	- the console is placed in bottom left tab
+		terminal --> dotnet test
+		- errors will appear
+
+Fix projects
+- in file TestProject1/TestCalculatior.cs add line 20 - 52
+------------------------------------------------------------
+        [SetUp]
+        public void SetUp()
+        {
+            ChromeOptions options = new ChromeOptions();
+            // headless mode
+            options.AddArguments("headless");
+            // bypass OS security module
+            options.AddArguments("no-sandbox");
+            // overcome limited resource problems
+            options.AddArguments("disable-dev-shm-usage");
+            // Applicable to Windows OS only
+            options.AddArguments("disable-gpu");
+            // set widows size to enshure elements are visible
+            options.AddArguments("windows-size=1920x1080");
+
+            driver = new ChromeDriver(options);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            driver.Url = "http://softuni-qa-loadbalancer-2137572849.eu-north-1.elb.amazonaws.com/number-calculator/";
+
+            textBoxFirstNum = driver.FindElement(By.Id("number1"));
+            dropDownOperation = driver.FindElement(By.Id("operation"));
+            textBoxSecondNum = driver.FindElement(By.Id("number2"));
+            calcBtn = driver.FindElement(By.Id("calcButton"));
+            resetBtn = driver.FindElement(By.Id("resetButton"));
+            divResult = driver.FindElement(By.Id("result"));
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            driver.Quit();
+            driver.Dispose();
+        }
+------------------------------------------------------------
+
+In file TestProject2/Table.cs:
+- in line 13 - 40 add
+------------------------------------------------------------
+        [SetUp]
+        public void SetUp()
+        {
+            ChromeOptions options = new ChromeOptions();
+            // headless mode
+            options.AddArguments("headless");
+            // bypass OS security module
+            options.AddArguments("no-sandbox");
+            // overcome limited resource problems
+            options.AddArguments("disable-dev-shm-usage");
+            // Applicable to Windows OS only
+            options.AddArguments("disable-gpu");
+            // set widows size to enshure elements are visible
+            options.AddArguments("windows-size=1920x1080");
+
+            driver = new ChromeDriver(options);
+
+            // Add implicit wait
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Quit the driver
+            driver.Quit();
+            driver.Dispose();
+        }
+------------------------------------------------------------
+
+Replace line 59 and 60 with:
+------------------------------------------------------------
+Assert.That(File.Exists(path), Is.True, "CSV file was not created");
+Assert.That(new FileInfo(path).Length > 0, Is.True, "CSV file is empty");
+------------------------------------------------------------
+
+Remove line 85 - 86
+--------------------------
+// Quit the driver
+driver.Quit();
+--------------------------
+
+In file TestProject3/DropDown.cs
+- add as line 15 - 44 add
+------------------------------------------------------------
+        [TearDown]
+
+        public void TearDown()
+        {
+            // Quit the driver
+            driver.Quit();
+            driver.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ChromeOptions options = new ChromeOptions();
+            // headless mode
+            options.AddArguments("headless");
+            // bypass OS security module
+            options.AddArguments("no-sandbox");
+            // overcome limited resource problems
+            options.AddArguments("disable-dev-shm-usage");
+            // Applicable to Windows OS only
+            options.AddArguments("disable-gpu");
+            // set widows size to enshure elements are visible
+            options.AddArguments("windows-size=1920x1080");
+
+            // Create object of ChromeDriver
+            driver = new ChromeDriver(options);
+
+            // Add implicit wait
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+        }
+------------------------------------------------------------
+
+- remove line 85 - 86
+------------------------------------------------------------
+ // Quit the driver
+ driver.Quit();
+------------------------------------------------------------
+
+
+Build from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+		terminal --> dotnet build
+
+Start tests from terminal
+	- open Package Manager Console
+	- main menu / Tools / NuGet Package Manager / Package Manager Console
+	- the console is placed in bottom left tab
+		terminal --> dotnet test
+
+
+Create GitHub repository for the projects
+
+	1. create public repository in GitHub named HouseRentingSystem	
+		- add gitignore with 'VisualStudio' template or add locally with files below
+		- copy the repository url
+
+- in .gitignore file must contain at least when no 'VisualStudio' template is used
+---------------------------------------------------
+.vs/
+06-SeleniumWebDriver\TestProject1\bin
+06-SeleniumWebDriver\TestProject1\ojs
+06-SeleniumWebDriver\TestProject2\bin
+06-SeleniumWebDriver\TestProject2\obj
+06-SeleniumWebDriver\TestProject3\bin
+06-SeleniumWebDriver\TestProject3\bin
+---------------------------------------------------
+
+	2. Initialize repository
+		- open terminal and navigate to the projects
+		- initialize repository
+			terminal -- git init
+			terminal --> git status
+
+		- stage and commit the projects
+			terminal --> git add .
+			terminal -- git commit -m 'git init'
+
+		- connect local repository to remote repository 
+			terminal --> git remote add origin repository_url
+	
+		- sync remote repo with local repo
+			terminal --> git pull
+
+		- create remote 'main' branch and connect it with local 'main' branch
+			terminal --> git push -u origin main
+
+		- show branch details			# optional check
+			terminal -- git branch -vv
+			- we have to receive message like 'main b447000 [origin/main] repo init'
+
+
+Create workflow in .github/Workflow/selenium_pipeline.yml
+---------------------------------------------------
+name: SeleniumWebDriver CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: build
+      run: dotnet build --no-restore
+
+    - name: run TestProject1 tests
+      env:
+        CHROMEWEBDRIVER: /usr/bin/google-chrome
+      run: |
+        echo "Runniong TestProject1 tests"
+        dotnet test TestProject1/TestProject1.csproj --verbosity normal
+
+    - name: run TestProject2 tests
+      env:
+        CHROMEWEBDRIVER: /usr/bin/google-chrome
+      run: |
+        echo "Runniong TestProject2 tests"
+        dotnet test TestProject2/TestProject2.csproj --verbosity normal
+
+    - name: run TestProject3 tests
+      env:
+        CHROMEWEBDRIVER: /usr/bin/google-chrome
+      run: |
+        echo "Runniong TestProject3 tests"
+        dotnet test TestProject3/TestProject3.csproj --verbosity normal
+---------------------------------------------------
+
+Stage and commit and push the changes
+	terminal --> git add .
+	terminal -- git commit -m 'git init'
+
+In GitGub repo / Actions we must have started workflow and pass successfully
+
+
+
+==========================
+	03-Library		- homework Static and web service on render.com
+==========================
+
+
+
+---------------------------------------------------
+
+---------------------------------------------------
+
+
+
+
+---------------------------------------------------
+
+---------------------------------------------------
+
+

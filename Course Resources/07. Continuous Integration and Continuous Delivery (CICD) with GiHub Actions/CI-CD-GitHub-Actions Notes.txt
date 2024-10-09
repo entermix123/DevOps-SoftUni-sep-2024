@@ -355,10 +355,158 @@ parentKey:
 		▪ No need of quotes around strings unless the string contains special characters
 
 
-
 =========================
 	LIVE DEMO
 =========================
+
+GitHub Actions
+
+Type events
+- Repository - push, pull, commit, fork, etc.
+- Workflow - if step is failed, stop further execution or all steps passed, start next workflow, etc.
+	(unit tests passed, start ui tests. If they passed, start integration tests etc.)
+- Webhook - if specific url is accessed, start workflow
+- External - external platforms like 'Render'
+- Internal - Related to actions within the GitHub repository or organization
+
+Workflow:
+- Workflows contains one or more jobs. Defined by YAML file in .GitHub/workflow folder in the repo.
+	- Can be triggered by events in the repo, on schedule or manually or in combinations.
+One repo can have more than one workflow
+
+Jobs:
+- Jobs can be set to be executed in parallel or sequential. Parallel by default.
+	(we have to set dependencies between jobs - what job should be executed after what job)
+- Jobs have one or more steps. Steps are executed one after another for every job. 
+
+Runners:
+- 2 types - GitHub hosted and self-hosted
+	- for self-hosted, we have to cover requirements from GitHub to be used.
+- Server of the job. We have to specify the OS on what the job will be executed. Example: ubuntu-latest or windows-latest
+- They start, execute the job and stop
+
+Steps and Actions:
+- Steps contains one or more actions.
+- Steps and actions are executed sequential only.
+- Step is script or action
+	- example script: npm run start be &
+	- example action: action/setup-node@v3
+
+@ Actions are defined with 'uses' and scripts with 'run'. First step is almost always repository clone. There is a predefined action for this.
+----------------------------------------
+step:
+  - name: Checkout repository code
+    uses: action/checkout@v3
+  - name: Install package.json dependencies
+    run: npm install
+----------------------------------------
+
+
+Workflows key words:
+name - name of the workflow
+
+on - specify the event that will trigger the workflow (manually, scheduled or automatic)
+example:
+----------------------------------------
+name: Build Test Deploy
+
+on:
+  push:				# This allows triggering by push
+    branches: [ "main" ]
+  pull_request:			# This allows triggering by creating pull request
+    branches: [ "main" ]
+  workflow_dispatch:		# This allows manual triggering
+----------------------------------------
+
+jobs - used list of jobs
+example job - Lint Job (ESLint for JavaScript/TypeScript):
+----------------------------------------
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint .
+----------------------------------------
+
+runs-on - Specify runner environment
+
+steps - can have names but not mandatory. Preferably for more convenient code reading
+	- with - specify details of the action
+example:
+----------------------------------------
+step:
+  - name: Checkout repository code
+    uses: action/checkout@v3
+  - name: Use Node.js 20.x
+    uses: action/setup-node@v3
+    with: 
+      node-version: 20.x
+      cache: 'npm'
+----------------------------------------
+
+run - execute script
+
+
+GitHub Marketplace - ready to use actions, created by people and organizations
+	- After creating new workflow in the repo, we can use already created one for the technologies we work with.
+
+
+Flow - specific event occur (pull request is opened, fork is made, issue is opened, etc.)
+- Start Workflow
+	- Starting workflow jobs
+		- Start jobs steps
+			- Execute specific step actions
+
+
+====================
+	YAML 	      - wide DevOps used code language - light weight
+====================
+
+YAML Syntax
+
+- Indentation
+	- Spaces are critical
+	- Tabs are not allowed
+- Structure is key-value pair, separated with ':'
+- Lists can be used with dahs and space '- ' in jobs or steps structures
+- Nested structures - nested key-value pairs
+Example nested YAML structure
+----------------------------------------
+parentKey:
+  childKey: value
+  childList:
+    - Item 1
+    - Item 2
+----------------------------------------
+- Scalars - Strings, numbers and Booleans. 
+	No need to quotes strings unless the string contains special character
+- Comments can be included with '# comment'
+
+---------------------------------------------------------------
+There is extension for VSCode for GitHub Actions
+	- search for 'github actions' and install first shown
+	- it helps writing workflows
+---------------------------------------------------------------
+
+Other YAML validators
+	- https://www.yamllint.com/
+	- https://jsonformatter.org/yaml-validator
+	- https://onlineyamltools.com/validate-yaml
+	- https://yamlchecker.com/
+
 
 
 
