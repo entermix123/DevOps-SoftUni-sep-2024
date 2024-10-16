@@ -1154,17 +1154,361 @@ In GitGub repo / Actions we must have started workflow and pass successfully
 	03-Library		- homework Static and web service on render.com
 ==========================
 
+Open the project in VS Code
 
+Instal dependencies
+	terminal --> npm install
+	
+Start backend
+	terminal --> npm run server
 
+Start frontend
+	new terminal --> npm run start
+
+Start tests
+	new terminal --> npm test
+
+Goof practice is to rename the terminal names to what they are running
+
+We can find all the files that use the port with Ctl + Shift + f / 3030 and change it if we have to
+
+We can login with mail: peter@abv.bg / pass: 123456
+
+Initialize and publish public repository with VS Code
+	- Go to 'Source Control' Tab
+	- Click Initialize repository
+	- Add comment repo init
+	- Click publish repository
+	- choose publick repository option
+
+Got ot github / Actions and add workflow
+---------------------------------------------------
+name: Build Test Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code 
+      uses: actions/checkout@v4
+    - name: Set Node.js             
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - name: install dependencies
+      run: npm ci
+    - name: Install Playwright
+      run: npx playwright install
+    - name: Start Backend
+      run: npm run server &
+    - name: Start Frontend                    
+      run: npm run start &
+    - name: Start Tests                   
+      run: npm run test
 ---------------------------------------------------
 
+The '&' at the end of every 'run:' command is to execute the script in background mode and keep the session available
+
+
+
+====================
+Deploy to Render.com
+====================
+
+---------------
+Deploy Back-End
+---------------
+
+	- Login with GitHub account
+
+	- Back-End as NEW / Web Service
+		- connect the specific repository
+			- source code: choose the repo
+		- Language: Node
+		- Branch: main
+		- Region: Oregon (US West) - by default
+		- Build Command: npm install
+		- Start Command: npm run server
+		- Instance Type: Free
+		- use existing PI Key or create new one
+		- Click on 'Deploy' button
+
+	- After successful deploy we can access Back-End on the Render.com url with Postman
+		- login request: POST with body {"email": "peter@abv.bg", "password": "123456"} 
+			to 'https://library-mc9j.onrender.com/users/login'
+			- we can login, etc.
+
+	- Turn OFF automatic deploy
+		- go to Dashboard
+		- choose the deployed project
+			- go to Settings / Build & Deploy section / Auto-Deploy / No / Save Changes
+
+	- Find deploy hook address
+		- go to Dashboard
+		- choose the deployed project
+			- go to Settings / Build & Deploy section / Deploy Hook / Copy the hook and save it somewhere safe
+			- we need only the part in the double quotes shown below:
+			'https://api.render.com/deploy/ "srv-cs7sckjv2p9s73f9xxxx" ?key=ifzKaA_FZs4'
+
+	- Use existing or generate Render API Key
+		- Generate new RenderAPI key
+			- Profile / Account Settings / API Keys / Create API Key
+				- give name to the API Key - example LibraryCatalogKey
+				- save the key somehwere safe - rnd_8OIDcCjEz7d5UFF45kyWbBlgxxxx
+		 
+
+----------------
+Deploy Front-End
+----------------
+
+	- Front-End as NEW / Static Site
+		- connect the specific repository
+			- source code: choose the repo
+		- Build Command:
+		- Publish directory: ./
+		- Click on 'Deploy' button
+
+	- Turn OFF automatic deploy
+		- go to Dashboard
+		- choose the deployed project
+			- go to Settings / Build & Deploy section / Auto-Deploy / No / Save Changes
+
+	- Find deploy hook address
+		- go to Dashboard
+		- choose the deployed project
+			- go to Settings / Build & Deploy section / Deploy Hook / Copy the hook and save it somewhere safe
+			- we need only the part in the double quotes shown below:
+			'https://api.render.com/deploy/ "srv-cs7ugnij1k6c73foxxxx" ?key=X3Zi9nKaAgg'
+
+
+----------------------------------------------
+Fix the API addesses we use to call the server
+----------------------------------------------
+
+Open the project in VS Code
+
+create src/config.js
+---------------------------------------------------
+export const settings = { host: "https://library-mc9j.onrender.com" };
+---------------------------------------------------
+Save changes - Ctrl + S
+
+in api.js
+---------------------------------------------------
+import * as config from '../config.js';
+export const settings = config.settings;
+...
+---------------------------------------------------
+Save changes - Ctrl + S
+
+in data.js
+---------------------------------------------------
+import * as api from './api.js';
+const host = api.settings.host;
+
+export const login = api.login;
+export const register = api.register;
+export const logout = api.logout;
+...
+---------------------------------------------------
+Save changes - Ctrl + S
+
+Start Front-End locally and chec if will connect to already deployed Back-End
+
+Run the test locally
+	terminal --> npm test
+	- test 4 and 10 should fail
+
+------------------------------------------------
+Fix the tests to refer the deployed Back-End url
+------------------------------------------------
+
+In tests/ui.test.js add
+---------------------------------------------------
+	- line 46:     await page.waitForURL('http://localhost:3000/catalog');
+	- line 173:    await page.waitForURL('http://localhost:3000/catalog');
+---------------------------------------------------
+Save changes - Ctrl + S
+
+Run the test locally
+	terminal --> npm test
+	- all tests should pass
+
+
+Fix the workflow to change the settings and deploy automatic. Create and set secrets and API KEY.
+
+Add step with script to update the config.js, host to change server call to address localhost:3030,
+---------------------------------------------------
+name: Build Test Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+  
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - name: install dependencies                     
+      run: npm install
+    - name: Update the config
+      run: echo "export const settings = {host:\"http://localhost:3030\"}" > src/config.js
+    - name: Install Playwright                   
+      run: npx playwright install
+    - name: Start Backend                   
+      run: npm run server &
+    - name: Start Frontend                    
+      run: npm run start &
+    - name: Start Tests                   
+      run: npm test
+---------------------------------------------------
+
+We can test the command with bash terminal and looking at config.js file
+	bash terminal --> echo "export const settings = {host:\"http://localhost:3030\"}" > src/config.js
+
+	- the line should change to "export const settings = {host:"http://localhost:3030"}"
+	- revert the changes to "export const settings = { host: "https://library-mc9j.onrender.com" };"
+
+
+Commit changes and see if GitHub actions are successful
+	terminal --> git add .
+	terminal --> git commit "update config"
+	terminal --> git push
+
+
+
+==================================
+Set automatic deploy to render.com
+==================================
+
+Add Automaric deploy to render with steps deploy_be and deploy_fe
+---------------------------------------------------
+name: Build Test Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+  
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - name: install dependencies                     
+      run: npm install
+    - name: Update the config
+      run: echo "export const settings = {host:\"http://localhost:3030\"}" > src/config.js
+    - name: Install Playwright                   
+      run: npx playwright install
+    - name: Start Backend                   
+      run: npm run server &
+    - name: Start Frontend                    
+      run: npm run start &
+    - name: Start Tests                   
+      run: npm test
+
+  deploy_be:
+    runs-on: ubuntu-latest
+    needs: build_test
+    steps:
+      - name: Deploy to production
+        uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.MY_RENDER_SERVICE_BE_ID }}
+          api_key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait_deploy: true 
+
+  deploy_fe:
+    runs-on: ubuntu-latest
+    needs: build_test
+    steps:
+      - name: Deploy to production
+        uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.MY_RENDER_SERVICE_FE_ID }}
+          api_key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait_deploy: true 
 ---------------------------------------------------
 
 
+Set Secrets in GitHub
+	- secrets.MY_RENDER_SERVICE_BE_ID
+	- secrets.MY_RENDER_SERVICE_FE_ID
+	- secrets.MY_RENDER_API_KEY
+
+	- go to GitHub / repo_name / Settings / Secret and vVariables / Actions
+		- New repository secret
+			- name: MY_RENDER_SERVICE_BE_ID
+			- Secret: srv-cs7sckjv2p9s73f9xxxx
+		- New repository secret
+			- name: MY_RENDER_SERVICE_FE_ID
+			- Secret: srv-cs7ugnij1k6c73foxxxx
+		- New repository secret
+			- name: MY_RENDER_API_KEY
+			- Secret: rnd_8OIDcCjEz7d5UFF45kyWbBlgxxxx
 
 
+Commit changes and see if deploys on GitHub / Actions and Render.com / Dashboard are successful
+	terminal --> git add .
+	terminal --> git commit "update config"
+	terminal --> git push
+
+Now we can 
+	- start locally Front-End and test the deployed Back-End on Render.com
+	- we can test deployed Front-End on given address from Render.com - https://zero3-library-oq88.onrender.com/
+
+After test, we can stop BE and FE in Render.com - Dashboard / Project / Setiings / Suspend Service
+
+
+===================
+Real world pipeline - OPTIONAL
+===================
+	- We can create another pair of front-end and back-end for staging in render
+
+Build and Test in GitHub and Render flow
+	--> Render Staging-BE
+	--> Render Staging-FE
+	--> Playwright Test
+		--> Render Production-BE
+		--> Render Production-FE
+
+------------------
+Fix the tests urls
+------------------
+
+in ui.test.js on line 3 add
+---------------------------------------------------
+const baseURL = 'https://zero3-library-oq88.onrender.com/'
 ---------------------------------------------------
 
----------------------------------------------------
-
+replace all "http://localhost:3000" with baseURL in ui.test.js
+	- select 'http://localhost:3000' and click 'Ctrl + d' to select all entitie
+		- change them to baseURL
 
