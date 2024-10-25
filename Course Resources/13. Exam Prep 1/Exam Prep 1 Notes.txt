@@ -1,0 +1,250 @@
+Requirements
+	- Internet
+	- git and GitHub account
+	- Microsoft Word
+	- Archive Software - 7zip, Winrar, winzip
+	- .NET - terminal --> dornet --version
+	- MS Visual Studio (for .NET applications)
+	- Visual Studio Code
+	- Node.js
+	- Jenkins
+
+1. Resource Files
+	- open repo - https://github.com/SUContent/SEDO-Regular-Exam-2024-10/
+
+2. Working with Git and GitHub
+	- Fork the repo 	
+		- press Fork button top right
+		- uncheck 'Copy the main branch only' checkbox
+		- click 'Create fork' button
+
+Open the project in MS Visual Studio
+	- Build the app locally in MS Visual Studio
+		- open View / Solution Explorer
+			- right click on Solution / Build solution
+		- Check .NET version
+			- right click on solution / Properties / .NET version
+		- Start tests
+			- open View / Test Explorer / Run Tests
+
+	- Make build and tests from terminal
+		- open View / Other Windows / Package Manager Console
+			terminal --> dotnet build
+			terminal --> dotnet test
+
+
+3. Configure GitHub Actions
+
+Create 2 workflow:
+
+@
+I: for develop branch - to run unit tests
+	- go to GitHub / Repo / Actions and search for '.net'
+		- choose: '.NET'
+		- click 'Configure' button
+		- template will appear
+
+set unit_test.yml
+------------------------------------------------------
+name: Build & Run Unit Tests
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build_unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repsitory
+      uses: actions/checkout@v4
+    - name: Setup .NET version 6
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Execute Unit Tests
+      run: dotnet test HouseRentingSystem.UnitTests/HouseRentingSystem.UnitTests.csproj --no-build --verbosity normal
+------------------------------------------------------
+	- Commit to 'main' branch
+	- Set description as 'Added workflow for "develop branch" that triggers unit tests'
+
+	- Merge from 'main' branch to 'develop' branch in forked repo !!! (the copy in your GitHub account)
+		- in Repo / Pull Request / Create pull request 
+			- choose to merge TO the forked project in your account / deveopl branch FROM main branch
+			- Set description as 'Trigger unit test when push develop'
+			- click 'Commit changes' button
+			- click 'Merge pull request' / Confirm merge
+		- In Repo / Actions we can see that workflow with unit tests is running
+	
+@@
+II: for staging branch - to run integration tests
+	- go to GitHub / Repo / Actions and search for '.net'
+		- choose: '.NET'
+		- click 'Configure' button
+		- template will appear
+
+set integration_test.yml
+------------------------------------------------------
+name: Build & Run Integration Tests
+
+on:
+  push:
+    branches: [ "staging" ]
+
+jobs:
+  build_integration_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repsitory
+      uses: actions/checkout@v4
+    - name: Setup .NET version 6
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Execute Integration Tests
+      run: dotnet test HouseRentingSystem.Tests/HouseRentingSystem.Tests.csproj --no-build --verbosity normal
+------------------------------------------------------
+	- Commit to 'main' branch
+	- Set description as 'Added workflow for "staging" branch that triggers integration tests'
+
+	- Merge from 'main' branch to 'staging' branch in forked repo !!! (the copy in your GitHub account)
+		- in Repo / Pull Request / Create pull request 
+			- choose to merge TO the forked project in your account / deveopl branch FROM main branch
+			- Set description as 'Trigger integration tests when push staging'
+			- click 'Commit changes' button
+			- click 'Merge pull request' / Confirm merge
+		- In Repo / Actions we can see that workflow with integration tests is running
+
+
+
+4. Create and Manage Branches
+FORKED GitHub repo / Branches / New Branch
+	- New branch name: feature-ci-pipeline
+	- Source: develop
+	- Create new branch
+
+
+5. Configure Jenkins
+
+Create Jenkinsfile
+Go to GitHb / Repo / Code
+	- go to 'feature-ci-pipeline' branch
+	- add new file name 'Jenkinsfile'
+
+Jenkinsfile
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('Restore dependencies') {
+            steps {
+                bat 'dotnet restore'
+            }
+        }
+        stage('Dotnet Build') {
+            steps {
+                bat 'dotnet build --no-restore'
+            }
+        }
+        stage('Execute tests') {
+            steps {
+                bat 'dotnet test --no-build --verbosity normal'
+            }
+        }
+    }
+}
+------------------------------------------------------
+Commit changes
+
+
+Start Jenkins and login
+	- Win Search / 'services'
+	- search for 'jenkins' and start the process
+	- open Jenkins on localhost:808 and login
+
+----------------------------------
+Install MS Build Plugin in Jenkins
+----------------------------------
+
+Dahsboard / Manage Jenkins / Plugins
+	- Available plugins / search for 'msbuild' and install the plugin
+	- restart Jenkins after installation
+
+-----------------------------------------------
+Find the msbuild directory and test the project
+-----------------------------------------------
+
+We can find the path to our msbuild in MS Visual Studio / Tools / Command Line / Developer Command Prompt
+	- Developer Command Prompt terminal --> where msbuild
+	- the result must be like:
+		 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe'
+	- copy the path
+
+Test the build and run the tests from terminal
+	- Package Manager Console terminal --> dotnet build
+	- Package Manager Console terminal --> dotnet test
+	- if the build and tests are successfull then close MS Visual Studio
+
+
+-----------------------------------------
+Set tha path of msbuild folder in Jenkins
+-----------------------------------------
+
+Add the path in Jenkins - Dahsboard / Manage Jenkins / Tools / MSBuild installations
+	- Name: Msbuild-v6
+	- Path to MSBuild Installation:
+		 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe
+	- Save
+
+------------------------------------
+Create and test a new job in Jenkins
+------------------------------------
+
+Dashboard / New Item 
+	- Enter an item name: Exam Prep 1
+	- Pipeline
+	- OK
+	- Pipeline / Definition / Pipeline script from SCM
+		- SCM: Git
+			- Repository URL: https://github.com/entermix123/SEDO-Regular-Exam-2024-10/
+			- Branches to build: */feature-ci-pipeline
+	- Save
+
+Dashboard / Exam Prep 1 / Build Now
+
+In GitHub create and merge pull request from 'feature-ci-pipeline' branch to 'develop' branch with Jenkinsfile
+	
+
+6. Test and Merge
+In GitHub create and merge pull request from 'develop' branch to 'staging' branch
+
+
+7. Create a Pull Request to Original Repository
+In GitHub create pull request 
+	from 
+	FORKED repo - https://github.com/entermix123/SEDO-Regular-Exam-2024-10 / staging branch 
+	to 
+	ORIGINAL repo - https://github.com/SUContent/SEDO-Regular-Exam-2024-10 / staging branch
+
+	- set Title: Staging changes from YordanB Exam Prep1
+	- set Description: YordanB - Final Pull Request for Exam Prep 1
+ 
+8. Submission
+	- create word file with name 'Solution-Resources-Template-Software-Engineering-and-DevOps'		
+		 - GitHub URL: https://github.com/entermix123/SEDO-Regular-Exam-2024-10
+	- zip the file
+	- upload the file to SoftUni system
+
+
+
+
+
+

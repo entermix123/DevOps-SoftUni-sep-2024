@@ -1,0 +1,1170 @@
+Ctrl + Shift + t - reopen last closed window in browser
+
+---------------
+Install Jenkins
+---------------
+
+Install on Windows instructions - https://www.jenkins.io/doc/book/installing/windows/
+	- install Java 11, 17 or 21 - https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html
+
+Choose OS and install Jenkins - https://www.jenkins.io/download/#downloading-jenkins
+
+
+OPTIONAL:
+===========================================================
+INSTALL JENKINS WITH DOCKER - https://github.com/jenkinsci/docker/blob/master/README.md
+	- go to 'https://www.docker.com/products/docker-desktop/' register and install docker desktop (windows)
+	- install docker image and run container
+		terminal --> 
+docker run -p 8080:8080 -p 50000:50000 --restart=on-failure -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk17
+
+	- copy the password printed on the console
+		- save the password somewhere safe
+	- go to browser: http://localhost:8080/ and enter the password
+	- Choose option to install most used plugins
+		- retry if some plugins are not installed
+	- create Admin user
+		Username: fill the name
+		Password: already set
+	Confirm Password: put pass again
+	- Click Save and Continue
+	- Jenkins URL: http://localhost:8080/
+	- Click Save and Finish
+
+Now Jenkins should be available on localhost://8080
+
+Install Specific Plugins - Dashboard / Manage Jenkins / Plugins / Available Plugins and search for:
+	- Pipeline	# can be already installed
+	- Blue Ocean	
+
+Look at documentation for more advanced activities:
+	- https://github.com/jenkinsci/docker/blob/master/README.md
+===========================================================
+
+
+=================================
+INSTALL JENKINS LOCALLY (WINDOWS)
+=================================
+
+Choose Windows OS and install Jenkins - https://www.jenkins.io/download/#downloading-jenkins
+
+Installation Instructions - https://www.jenkins.io/doc/book/installing/windows/
+
+Start the installation and on Step 3: 
+	- Service logon credentials
+
+- On Setup / Logon Type - Login with Windows Account credentials
+	- Account:	.\Windows User
+	- Password: 	Windows Account Password
+	- click 'Test credentials' button
+
+On Error follow the instruction - https://www.jenkins.io/doc/book/installing/windows/#invalid-service-logon-credentials
+	- login windows with administrator user
+	- set rights
+		- Control Panel / Windows Tools / Local Security Policy
+		- if Local Security Policy is not available in Windows Tools directory:
+
+Activate group policy on windows 11
+	- create notepad file on the desktop and add
+--------------------------------------------------------
+@echo off
+pushd "%~dp0"
+dir /b %SystemRoot%\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~3*.mum >gp.txt
+dir /b %SystemRoot%\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~3*.mum >>gp.txt
+for /f %%i in ('findstr /i . gp.txt 2^>nul') do dism /online /norestart /add-package:"%SystemRoot%\servicing\Packages\%%i"
+pause
+--------------------------------------------------------
+Save As / name: EnableGPedit.bat , type: all files
+--------------------------------------------------------
+- Start the script as administrator on the desctop and wait to finish
+- Now Control Panel / Windows Tools / Local Security Policy should be visible
+	- go to Local Policy / User Rights Assigment
+		- on right page got to 'Log on as a service'
+			- click 'Add User or Group' / Advanced / Find Now / find your current profile / OK / Apply / OK
+--------------------------------------------------------
+
+Try to login again in Jenkins installation process, step 3
+- On Setup / Logon Type - Login with Windows Account credentials
+	- Account:	'.\Microsoft_User' (added user)
+	- Password: 	Windows Account Password
+	- click 'Test credentials' button
+		- the check should pass successfully
+	- Click 'Next' button
+	- Click 'Test Port' button
+		- if button is used, set different one
+	- Test Port check should pass successfully
+	- Click 'Next' button
+	- Navigate to java 21 folder, usually 'C:\Program Files\Java\jdk-21\'
+	- Click 'Next' button
+	- Click 'Next' button
+	- Click 'Install' button
+	- Click 'Yes' on Prompt Up window
+	- Click 'Finish' button
+
+
+Check if service 'Jenkins' is running - Windows Key / services
+	- Search for 'Jenkins'
+	- if service is not available install Jenkins again as local service (without credentials)
+
+
+Find service 'Jenkins' in Windows Key / services
+	- stop 'Jenkins' service
+		- double click / Stop
+		- go to 'Log On' tab
+			- check radio button 'This account'
+			- Browse and find administrator account
+			- set 'Password' and 'Confirm password' fields
+			- Apply / OK
+
+	- Start the service again
+
+Now we can access Jenkins on http://localhost:8080/
+	- we need to use the password in Location 'C:\ProgramData\Jenkins\.jenkins\secrets\initialAdminPassword'
+	- click 'Continue' button
+	- click 'install suggested plugins' field
+		- retry if some plugins are not installed
+	- create Admin user
+		Username: fill the name
+		Password: already set
+	Confirm Password: put pass again
+	- Click Save and Continue
+	- Jenkins URL: http://localhost:8080/
+	- Click Save and Finish
+
+Expose local port to be used by GitHub using NGROK 
+	- Login with GitHub / Register and install NGROK - https://dashboard.ngrok.com/get-started/setup/windows
+	- open the exe like administrator
+	- add your authtoken to the default ngrok.yml		
+		ngrok terminal --> ngrok config add-authtoken 2nkQoMDDMie6vRrdaLo0mxxxxxx_oYtQUw3Tw6Rzm3xxxxxx
+	- expose port 8080
+		ngrok terminal --> ngrok http http://localhost:8080
+
+============================
+Step 2: Create a GitHub Repo
+============================
+
+Open project 02-Student-Registry-App-Docker from the resources in VS Code
+	- install dependencies
+		terminal --> npm install
+	- try to start the project
+		terminal --> npm tun start
+		- error will appear and we need to change the port of the project service
+			- find all places in the project port 8080 i sued
+			- Ctrl + Shift + f / search for '8080' and change all entities to '8081' and save the changes
+	- start the project again
+		terminal --> npm tun start
+		- now we can access the app on localhost:8081
+	- run tests
+		terminal --> npm run test
+
+	- initialize repository with VS Code
+		- go to source control tab (Ctrl + Shift + g)
+		- click initialize Repository
+			- add .gitignore file with "node_modules" inside in the main project directory
+		- Stage all changes
+			- click on '+' sign on Changes line - there should be 19 files
+		- Set as a message "repo init"
+		- click 'Commit' and 'Publish Branch' buttons
+		- give the repo proper name and choose public repository option in the central top console
+		
+
+===================================
+Step 3: Create a New Job in Jenkins
+===================================
+
+Open and login in Jenkins on localhost:8080
+
+Create Job
+	Dashboard / New Item or Create Job
+		- set name: Student Register App
+		- choose 'Freestyle project' / OK
+
+	Set Git connection
+		- open the created job and go to 'Configure'
+		- set 'Source Code Management' to Git
+			- set Repository URL to the repo we created earlier
+			- if the repo is privet, we must add credentials
+		- Branches to build / Branch Specifier (blank for 'any'): */main
+		- Save
+
+Start the job
+	- Dashboard / Job / Build Now
+	- See details for the job
+		- in Build History tab (bottom right side) we can see details when click on the tick icon before the build number
+	
+
+How to set Jenkins to delete the repo after executing Jobs over it
+	- we can find where Jenkins store the repo files
+		- go to job details and the 3th line: 'Building in workspace C:\ProgramData\Jenkins\.jenkins\workspace\'
+	- we can set post-action for the job
+		- Job / Configure / Post-build Actions / Delete workspace when build is done / Save
+	- Job / Build Now
+		- we can check that the workspace is deleted in 'C:\ProgramData\Jenkins\.jenkins\workspace\'
+
+	# It is better NOT to delete the workspace if you are working daily on a project #
+
+
+==============================
+Step 4: Source Code Management
+==============================
+
+- Job / Configure / Build Steps
+	- click 'Add build step' button / Execute Windows batch command (for Windows OS) or Execute Shell (for Linux)
+		- in the field set: npm install
+	- Save
+
+	- Start the Job
+		- Dashboard / Job / Build Now
+	 	now in the workspace: 'C:\ProgramData\Jenkins\.jenkins\workspace\<repo_name>' we must have folder node_modules
+-------------------
+Step 6: Build Steps
+-------------------
+	- click 'Add build step' button / Execute Windows batch command (for Windows OS) or Execute Shell (for Linux)
+		- in the field set: npm test
+
+	- Start the Job
+		- Dashboard / Job / Build Now
+		- in Dashboard / Job / Build History tab / status tick we can see the console output
+
+# We can combine few command like 'npm install && npm test' in the build step, but if fails, the traceability is not clear #
+
+
+=========================================================
+Step 5: Build Triggers - Connect GitHub repo with Jenkins
+=========================================================
+
+Exposed port for Jenkins (use ngrok to expose) - https://dashboard.ngrok.com/get-started/setup/windows
+
+	- expose port 8080
+		ngrok terminal --> ngrok http http://localhost:8080
+		or
+		ngrok terminal --> ngrok http 8080
+	- copy the exposed address - Forwarding: 'https://xxxx-xxx-xxx-xxx-xxx.ngrok-free.app'
+
+------------------------------------------
+Configure GitHub repo with Jenkins webhook
+------------------------------------------
+In GitHub / Repo / Settings / Webhooks / Add webhook
+	- Payload URL *: https://xxxx-xxx-xxx-xxx-xxx.ngrok-free.app/github-webhook/
+		# set the ngrok exposed address with '/github-webhook/' at the end #
+	- Content type *: application/json
+	- SSL verification: Enable SSL verification
+	- Which events would you like to trigger this webhook?: Just push event
+	- checkbox 'Active': checked
+	- Add Webhook
+		- a green tick should appear before the hook on Webhook tab in GitHub if hook is successful
+		
+----------------------------
+Configure webhook in Jenkins
+----------------------------
+	Dashboard / Job / Configure / Build Triggers		
+		- check 'GitHub hook trigger for GITScm polling' checkbox
+		- Save
+
+--------------------------------------------------------------------------------
+Make change in the code in VS Code and push to GitHub to trigger the Jenkins job
+--------------------------------------------------------------------------------
+	- add empty line in tests/about.tests.js and save the file
+	- stage commit and push the change to GitHub
+		terminal --> git commit -a -m "trigger Jenkins webhook"	
+		terminal --> git push
+
+Now the job in Jenkins should start automatically.
+
+=====================================
+Step 7: Configure Jenkins with Docker
+=====================================
+Copy 'Dockerfile' and 'doker-compose.yml' files from course resources (03-Student-Registry-App) and put them in the main project directory.
+
+Stage commit and push the change to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "docker files added"	
+	terminal --> git push
+
+Register and install Docker - https://www.docker.com/products/docker-desktop/
+	- Start Docker locally
+	- free port 8080 - stop any container that runs on port 8080
+
+Login and generate authentication token from Docker Hub - https://hub.docker.com/
+	Account Settings / Personal access tokens / Generate new token
+		- Access token description: Jenkins webhook exercise
+		- Access permission: Read & Write & Delete
+		- Generate
+		- copy the token
+
+Go to Jenkins / Dashboard / Job / Configure / Build Steps / Add build Step / Execute Windows batch command
+	- field: 
+		docker build -t dockerhub_username/studentapp .
+		docker login -u dockerhub_username --password dckr_pat_xxxxxxxxxxxxxxxxxxxx
+		docker push dockerhub_username/studentapp
+	- Save
+	- Start the job
+		Jenkins / Dashboard / Job / Build Now
+
+After successful build we should have new image  locally in docker images and new image in dockerhub.
+
+
+-------------------------------------------------------
+How to set variables (username and password) in Jenkins
+-------------------------------------------------------
+
+Jenkins / Job / Configure / Build Environment
+	- check 'Use secret text(s) or file(s)' checkbox
+		- Add / Username and password (separated)
+			- Username Variable: user
+			- Password Variable: pass
+			- Credentials/ check 'Specific credentials' / Add
+				- Jenkins
+					- Scope: Global (Jenkins, nodes, items, all child items, etc)
+					- username: dockerhub_username
+					- password: secret
+
+				- Add
+	- Save
+
+Update job config
+	Job / Config
+		- field: 
+			docker build -t dockerhub_username/studentapp .
+			docker login -u %user% --password %pass%
+			docker push dockerhub_username/studentapp
+
+Start the Job
+	Dashboard / Job / Build Now
+
+We can now see the image in docker locally and in Docker Hub on 'https://hub.docker.com/r/dockehub_username/studentapp/tags'
+
+We can manage credentials in Jenkins / Manage Jenkins / Credentials
+
+
+
+-----------------------------------------------------------
+Set tag (latest or build number) for every build in Jenkins
+-----------------------------------------------------------
+Job / Config / Build Steps / Specific step / 
+	- click on 'See the list of available environment variables'	
+		- we can see all variables that we can use			
+		- we will use 'BUILD_NUMBER'
+	- field: 
+		docker build -t dockerhub_username/studentapp:%BUILD_NUMBER% .
+		docker login -u %user% --password %pass%
+		docker push dockerhub_username/studentapp:%BUILD_NUMBER%
+
+We can now see the image with updated name in docker locally and in Docker Hub on 'https://hub.docker.com/r/dockehub_username/studentapp/tags'
+
+
+============================
+Step 8: Test the CI Pipeline
+============================
+
+Open the project in VS Code and make small change
+	- in tests/about.tests.js add a empty line and save changes (ctrl + s)
+
+Stage, commit and push changes to GitHub
+	terminal --> git commit -a -m "trigger the pipeline with docker"
+	terminal --> git push
+
+Now We should see Jenkins Job started and finished successfully with next build number, docker images name updated locally and in Docker Hub on 'https://hub.docker.com/r/dockehub_username/studentapp/tags'
+
+
+====================================
+CD Pipeline – "Student Registry" App
+====================================
+
+Set docker-compose.yml file as:	(change 'image' and 'ports' vars)
+---------------------------------------------
+version: '3'
+services:
+  app:
+    image: dockerhub_username/studentapp:latest
+    ports:
+      - "8081:8081" # Map port 8081 on the host to port 3030 in the container
+    environment:
+      - NODE_ENV=production
+---------------------------------------------
+
+
+------------------------
+Set docker-compose build
+------------------------
+
+Configure last build step - add one more script
+	- field: 
+		docker build -t dockerhub_username/studentapp:%BUILD_NUMBER% .
+		docker login -u %user% --password %pass%
+		docker push dockerhub_username/studentapp:%BUILD_NUMBER%
+		docker tag docdanio/studentapp:%BUILD_NUMBER% docdanio/studentapp:latest
+		docker push docdanio/studentapp:latest
+
+Add new step
+	Job / Config / Build Steps / Build Steps / Add Build Step / Execute Windows batch command
+		- field: 
+			docker pull docdanio/studentapp:latest
+			docker-compose -f docker-compose.yml up -d
+		- Save
+
+Stage, commit and push changes to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "fixed dockerfile and docker-compose fies"
+	terminal --> git push
+
+
+Now We should see Jenkins Job started and finished successfully with tag 'latest', docker images name updated locally and in Docker Hub on 'https://hub.docker.com/r/dockehub_username/studentapp/tags'
+
+We must have also running container on address localhost:8081
+
+
+-----------------
+TEST THE PIPELINE
+-----------------
+
+in students-controller.js change line 5 to:
+------------------------
+      msg: "Hello DevOps",
+------------------------
+save the changes with 'ctrl + s'
+
+in home.test.js change line 8 to
+------------------------
+    assert.ok(body.includes("<h1>Hello DevOps</h1>"));
+------------------------
+save the changes with 'ctrl + s'
+
+Stage, commit and push changes to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "test pipeline"
+	terminal --> git push
+
+Now We should see Jenkins Job started and finished successfully with tag 'latest', docker images name updated locally and in Docker Hub on 'https://hub.docker.com/r/dockehub_username/studentapp/tags'
+
+We must have also running container on address localhost:8081 and we should see title 'Hello DevOps'
+
+
+We can rename Jenkins Job name
+	- Dashboard / Job ? General / Advanced / Display Name / Students CI
+
+
+
+=======================
+Separate CI and CD Jobs
+=======================
+
+----------------------------
+Create New Job 'Students CD'
+----------------------------
+
+In this step we will separate the Continuous Delivery actions
+
+Dashboard / New Item / 
+	- Enter an item name: Students CD
+	- Copy From: Student Register App
+	- OK
+
+Dashboard / Students CD / Configure
+- delete build step with commands:
+	- field: 
+		docker build -t dockerhub_username/studentapp:%BUILD_NUMBER% .
+		docker login -u %user% --password %pass%
+		docker push dockerhub_username/studentapp:%BUILD_NUMBER%
+		docker tag docdanio/studentapp:%BUILD_NUMBER% docdanio/studentapp:latest
+		docker push docdanio/studentapp:latest
+- Save
+ 
+------------------
+Fix the Student CI
+------------------
+Dashboard / Students CD / Configure
+- delete build step with commands:
+	- field: 
+		docker pull docdanio/studentapp:latest
+		docker-compose -f docker-compose.yml up -d
+- Save
+
+------------------------------------------------
+Set job Students CD to run after job Students CI
+------------------------------------------------
+
+Dashboard Students CI / Configure / Post-build Actions
+	- Build other projects: Students CD,
+		- select radio button 'Trigger only if build is stable'
+	- Build Triggers / uncheck 'GitHub hook trigger for GITScm polling' checkbox
+		- do not trigger if GitHub repo is changed !
+	- Save
+
+
+-----------------
+TEST THE PIPELINE
+-----------------
+
+Stop running containers in docker (port 8081)
+
+in students-controller.js change line 5 to:
+------------------------
+      msg: "Hello DevOps Again",
+------------------------
+save the changes with 'ctrl + s'
+
+in home.test.js change line 8 to
+------------------------
+    assert.ok(body.includes("<h1>Hello DevOps Again</h1>"));
+------------------------
+save the changes with 'ctrl + s'
+
+Stage, commit and push changes to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "test pipeline"
+	terminal --> git push
+
+Now We should see Jenkins Job started and finished successfully with tag 'latest', docker images name updated locally and in Docker Hub on 'https://hub.docker.com/r/dockehub_username/studentapp/tags'
+
+We must have also running container on address localhost:8081 and we should see title 'Hello DevOps Again'
+
+Ctrl + Shift + t - reopen last closed window in browser / info
+
+
+
+
+==========================
+3. Configuring Jenkinsfile - mostly used in practice !!!
+==========================
+
+- Start Jenkins - Windows / services / Jenkins / Start process / Login to localhost:8080
+
+- install plugins in Jnekins
+	- Pipeline if not installed with the installation
+		- Dhasboard / Manage Jenkins / Plugins
+			- in 'available pulgins' search for
+				- 'pipeline'(mandatory), if do not aapear it is already installed 
+					- allow us to set pipeline in one job
+				- 'blue ocean' (not mandatory), if do not aapear it is already installed
+					- check in installed plugins
+---------------------------
+Step 1: Run the App Locally
+---------------------------
+
+We can use aready linked project for CI Pipeline – "Student Registry" App - Task #2
+	- GitHub repo - https://github.com/entermix123/02-Student-Registry-App-Docker
+	- Aleardy created job will not trigger because ngrok is disabled / closed.
+
+Open the repo in VS Code
+	- Install VS Code Jenkinsfile extension
+		- go to Extensions tab and search for 'Jenkinsfile'
+		- install first result - https://marketplace.visualstudio.com/items?itemName=recode4dev.jenkinsfile
+
+Create simple 'Jenkinsfile' in the root dir of the app, syntax info on https://www.jenkins.io/doc/book/pipeline/syntax/
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+         stage('test message') {
+            steps {
+                echo 'Hello DevOps'
+            }
+        }
+    }   
+}
+------------------------------------------------------	
+Ctrl + S - save changes
+
+Stage, commit and push changes to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "test jenkinsfile"
+	terminal --> git push
+
+
+In Jenkins create new item
+	Dashboard / New Item 
+		- Enter an item name: Students-Jenkinsfile-Example
+		- Select an item type: Pipeline
+		- OK
+
+	Configure page will appear. Fill the fields:
+		- Description: This is simple pipeline job
+		- Save
+
+We can create separate views for job in Dashboard / top central tab / All / + / add name and select List View / Create
+	- name the view 'Jnekinsfile' and check job Students-Jenkinsfile-Example / OK
+
+Configure the job
+	- Dahsboard / Students-Jenkinsfile-Example / Configure / Pipeline section
+		- Definition: Pipeline script from SCM	# take jenkinsfile from Sorce Constrol Management system
+		- SCM: Git
+			- Repositories / Repository URL: https://github.com/entermix123/02-Student-Registry-App-Docker
+			- Repositories / Credentials: -none- 	# if the repo is public
+		- Branches to build
+			- Branch Specifier (blank for 'any'): */main
+		- Script Path: Jenkinsfile
+		- Save
+
+------------------------------------------------------
+Set Jenkins for scheduled check for Repository updates
+------------------------------------------------------
+Dahsboard / Job / Configure
+	- Poll SCM
+		- Schedule: * * * * *	# every minute or 'H/15 * * * *' for every 15 minutes
+	- Save
+
+After a minute the job will start. 
+	- We can see the result in Djashboard / Job / build number / Console Output 
+	- We can see the overview in Djashboard / Job / build number / Pipeline Overview
+
+
+We can manually check syntax of step in Dahsboard / Job / Pipeline Synatx
+	- Sample Step: bat: Windows Batch Script	# for windows
+	or
+	- Sample Step: sh: Shell Script			# for Linux
+	- click 'Generate Pipeline Script' button
+		- the script will be generated and we can use it in jenkinsfile
+
+
+Develop Jenkinsfile
+
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+         stage('NPM Install') {
+            steps {
+                bat 'npm install'
+            }
+        }
+        stage('Execute Tests') {
+            steps {
+                bat 'npm test'
+            }
+        }
+    }   
+}
+------------------------------------------------------
+Ctrl + S - save changes
+
+Stage, commit and push changes to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "test jenkinsfile"
+	terminal --> git push
+
+After a minute Jenkins will detect changes in the repo and will start the job autoatically.
+	- We can see the overview in Djashboard / Job / build number / Pipeline Overview
+	- We can see the logs in Djashboard / Job / build number / Console Output 
+
+
+Add step for security audit:
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+         stage('NPM Install') {
+            steps {
+                bat 'npm install'
+            }
+        }
+        stage('Run npm audit tests') {
+            steps {
+                bat 'npm audit'
+            }
+        }
+        stage('Execute Tests') {
+            steps {
+                bat 'npm test'
+            }
+        }
+    }   
+}
+------------------------------------------------------
+Ctrl + S - save changes
+
+Stage, commit and push changes to GitHub
+	terminal --> git add .
+	terminal --> git commit -m "added audit tests"
+	terminal --> git push
+
+Audit tests wil fail. We need to add step for fixint the audit dependencies
+	VS Code / terminal --> npm audit
+	VS Code / terminal --> npm audit fix
+	VS Code / terminal --> npm audit fix --force
+- run tests to check if the app is running
+	VS Code / terminal --> npm test
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "fixed audit tests"
+	terminal --> git push
+
+After a minute Jenkins will detect changes in the repo and will start the job autoatically.
+	- We can see the overview in Djashboard / Job / build number / Pipeline Overview
+	- We can see the logs in Djashboard / Job / build number / Console Output 
+
+--------
+Optional
+--------
+We can execute mmultiple scripts in one step, but the traceability and overview will not be as clear.
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+         stage('NPM Install and execute tests') {
+            steps {
+                bat 'npm install'
+		bat 'npm test'
+            }
+        }
+    }   
+}
+------------------------------------------------------
+
+
+
+------------------------
+HOW TO SET PARALLEL JOBS
+------------------------
+
+in Jenkinsfile add 'parallel{stage{steps{...}}}' to make a parallel jobs
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('NPM Install') {
+            steps {
+                bat 'npm install'
+            }
+        }
+        stage('Parallel Tasks') {
+            parallel {
+                stage('Run npm audit tests') {
+                    steps {
+                        bat 'npm audit'
+                    }
+                }
+                stage('Execute Tests') {
+                    steps {
+                        bat 'npm test'
+                    }
+                }
+            }
+        }
+    }
+}
+------------------------------------------------------
+Save changes - Ctrl + s
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "added parallel jobs"
+	terminal --> git push
+
+
+-------------------------------------
+Add 'Deploy' steps in the Jenkinsfile
+-------------------------------------
+
+In Jenkisfile add:
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('NPM Install') {
+            steps {
+                bat 'npm install'
+            }
+        }
+        stage('Parallel Tasks') {
+            parallel {
+                stage('Run npm audit tests') {
+                    steps {
+                        bat 'npm audit'
+                    }
+                }
+                stage('Execute Tests') {
+                    steps {
+                        bat 'npm test'
+                    }
+                }
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploy to staging'
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploy to production'
+            }
+        }
+    }
+}
+------------------------------------------------------
+Save changes - Ctrl + s
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "added deploy steps in Jenkinsfile"
+	terminal --> git push
+
+
+
+--------------------------------------------------------------
+Set CD in Jenkinsfile to approve manually deploy to production
+--------------------------------------------------------------
+
+In Jenkinsfile add:
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('NPM Install') {
+            steps {
+                bat 'npm install'
+            }
+        }
+        stage('Parallel Tasks') {
+            parallel {
+                stage('Run npm audit tests') {
+                    steps {
+                        bat 'npm audit'
+                    }
+                }
+                stage('Execute Tests') {
+                    steps {
+                        bat 'npm test'
+                    }
+                }
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploy to staging'
+            }
+        }
+        stage('Approval for Production') {
+            steps {
+                script {
+                    input message: 'Approve deployment to production?', ok: 'Deploy'
+                }
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploy to production'
+            }
+        }
+    }
+}
+------------------------------------------------------
+Save changes - Ctrl + S
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "added manual approve step (CD) in Jenkinsfile"
+	terminal --> git push
+
+
+We need t oapprove the deployment 
+	Dashboard / Job / Build number
+		- Click 'Deploy' or 'Abort' to finish the build
+
+
+Install 'Blue Ocean' plugin and open it in the job. New Vision is presented with more features
+
+We can stop the automatic check for changes for the repo to stop make calls to GitHub and use resources.
+	Dahsboard / Job / Configure
+		- uncheck 'Poll SCM' checkbox
+		- Save
+
+We can manually run the job on change
+	Dahsboard / Job / Build Now
+
+
+
+==================================================
+4. "HouseRentingSystem" App – ASP.NET Core MVC app
+==================================================
+
+----------------------------------
+Install MS Build Plugin in Jenkins
+----------------------------------
+
+Dahsboard / Manage Jenkins / Plugins
+	- Available plugins / search for 'msbuild' and install the plugin
+	- restart Jenkins after installation
+
+-----------------------------------------------
+Find the msbuild directory and test the project
+-----------------------------------------------
+
+We can find the path to our msbuild in MS Visual Studio / Tools / Command Line / Developer Command Prompt
+	- Developer Command Prompt terminal --> where msbuild
+	- the result must be like:
+		 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe'
+	- copy the path
+
+Test the build and run the tests from terminal
+	- Package Manager Console terminal --> dotnet build
+	- Package Manager Console terminal --> dotnet test
+	- if the build and tests are successfull then close MS Visual Studio
+
+
+-----------------------------------------
+Set tha path of msbuild folder in Jenkins
+-----------------------------------------
+
+Add the path in Jenkins - Dahsboard / Manage Jenkins / Tools / MSBuild installations
+	- Name: Msbuild-v6
+	- Path to MSBuild Installation:
+		 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe
+	- Save
+
+
+We can use already created repo from GitHub Actions Exercise: https://github.com/entermix123/HouseRentingSystem
+
+Open the repo in VS Code locally and create Jenkinsfile in root app directory
+
+Jenkinsfile
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('Build project') {
+            steps {
+                bat 'dotnet build'
+            }
+        }
+        stage('Execute tests') {
+            steps {
+                bat 'dotnet test'
+            }
+        }
+    }
+}
+------------------------------------------------------
+Save changes - Ctrl + S
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "added Jenkinsfile"
+	terminal --> git push
+
+
+
+--------------------------------------------
+Create job in Jenkins and start the pipeline
+--------------------------------------------
+
+Dashboard / New Item 
+	- Enter an item name: House-Renting-App-Jenkinsfile
+	- Pipeline
+	- OK
+	- Pipeline / Definition / Pipeline script from SCM
+		- SCM: Git
+			- Repository URL: https://github.com/entermix123/HouseRentingSystem
+			- Branches to build: */main
+	- Save
+
+Dashboard / House-Renting-App-Jenkinsfile / Build Now
+
+
+
+
+===============
+5. Selenium IDE
+===============
+
+We can use already created repository with GitHub Actions Exercise - https://github.com/entermix123/Selenium_IDE
+
+Open the project in VS Code and Jenkinsfile
+------------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('Build project') {
+            steps {
+                bat 'dotnet build'
+            }
+        }
+        stage('Execute tests') {
+            steps {
+                bat 'dotnet test'
+            }
+        }
+    }
+}
+------------------------------------------------------
+Save changes - Ctrl + S
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "added Jenkinsfile"
+	terminal --> git push
+
+
+--------------------------------------------
+Create job in Jenkins and start the pipeline
+--------------------------------------------
+
+Dashboard / New Item 
+	- Enter an item name: Selenium-IDE
+	- Pipeline
+	- OK
+	- Pipeline / Definition / Pipeline script from SCM
+		- SCM: Git
+			- Repository URL: https://github.com/entermix123/Selenium_IDE
+			- Branches to build: */main
+	- Save
+
+Dashboard / Selenium-IDE / Build Now
+
+
+
+
+======================
+6. Selenium Web Driver
+======================
+
+We can use already created repository with GitHub Actions Exercise - https://github.com/entermix123/SeleniumBasicExercise
+
+We can conver GitHub Actions workflow file to Jenkinsfile using ChatGPT	
+	- got to the repo https://github.com/entermix123/SeleniumBasicExercise
+	- Code / .github/workflows / dotnet-desktop.yml 
+		- copy the code
+	- got ot ChatGPT
+		- ask 'refactor this workflow to Jenkinsfile' and pastethe code
+
+
+Refactor the code in the Jenkinsfile and the result is below:
+
+Open the project in VS Code and Jenkinsfile
+------------------------------------------------------
+pipeline {
+    agent any
+
+    triggers {
+        pollSCM('* * * * *')
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'dotnet restore'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'dotnet build --no-restore'
+            }
+        }
+
+        stage('Run TestProject1 Tests') {
+            steps {
+                echo 'Running TestProject1 tests'
+                bat 'dotnet test TestProject1/TestProject1.csproj --verbosity normal'
+            }
+        }
+
+        stage('Run TestProject2 Tests') {
+            steps {
+                echo 'Running TestProject2 tests'
+                bat 'dotnet test TestProject2/TestProject2.csproj --verbosity normal'
+            }
+        }
+
+        stage('Run TestProject3 Tests') {
+            steps {
+                echo 'Running TestProject3 tests'
+                bat 'dotnet test TestProject3/TestProject3.csproj --verbosity normal'
+            }
+        }
+    }
+}
+------------------------------------------------------
+Save changes - Ctrl + S
+
+Stage, commit and push changes to GitHub again
+	terminal --> git add .
+	terminal --> git commit -m "added Jenkinsfile"
+	terminal --> git push
+
+
+--------------------------------------------
+Create job in Jenkins and start the pipeline
+--------------------------------------------
+
+Dashboard / New Item 
+	- Enter an item name: Selenium-Web-Driver-Jenkinsfile
+	- Pipeline
+	- OK
+	- Pipeline / Definition / Pipeline script from SCM
+		- SCM: Git
+			- Repository URL: https://github.com/entermix123/SeleniumBasicExercise
+			- Branches to build: */main
+	- Save
+
+Dashboard / Selenium-Web-Driver-Jenkinsfile / Build Now
+
+
+
+==========================================
+ADDITIONAL INFORMATION ABOUT JENKINS ITEMS
+==========================================
+
+---------------------------
+Create multibranch Pileline
+---------------------------
+	Dashboard / New Item / Multibranch Pipeline
+		- Selenium-IDE-Multibranch
+		- OK	
+		- Branch Sources / Add source: GitHub	
+------------------------------------------------------------------
+Create token in GitHub / Profile / Settings / Developer Settings
+	- Personal access token / Tokens (classic)
+		- Generate new token / Generate new token (classic)
+			- Note: Jenkins-Multibranch
+			- Expiration: 7 days
+			- checkboxes: repo, workflow, admin:org
+		- Generate token
+		- Copy the token
+------------------------------------------------------------------
+			- Credentials / Add
+				- Username: danio-github
+				- Password: paste the token
+				- Add
+				- select the username
+			- Repository HTTPS URL: https://github.com/entermix123/Selenium_IDE
+		- Build Configuration
+			- Script Path: Jenkinsfile
+		- Save
+
+Create new branch in the repo
+	- go to the repo https://github.com/entermix123/Selenium_IDE / Settings / Branches
+		- Create new branch
+			- New branch name: jenkins
+			- Source: main
+			- click 'Create new branch'
+
+Rescan the repo in Jenkins or set scheduled scan
+	- Scan manually
+		Dashboard / Selenium-IDE-Multibranch / Scan Repository Now
+	- Set scheduled scan
+		Dashboard / Selenium-IDE-Multibranch / Configuration
+			- Scan Repository Triggers
+				- check 'Periodically if not otherwise run' checkbox
+					- choose period
+			- Save
+
+Now Jenkins will scan and execute the Jenkinsfile for every branch. If we make changes in branch 'jenkins' or PR for branch 'main', Jenkins will run Jenkinsfile pipeline.
+
+------------------------------
+Info for Organizational Folder
+------------------------------
+
+Dashboard / New Item / Organizational Folder - This Item will scan all repos in linked GitHub Organization and list dem in the Dash board. Very useful!
+
+
+Ctrl + Shift + t - reopen last closed window in browser / info
+
