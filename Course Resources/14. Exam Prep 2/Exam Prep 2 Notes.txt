@@ -1,16 +1,5 @@
-Requirements
-	- Internet
-	- git and GitHub account
-	- Microsoft Word
-	- Archive Software - 7zip, Winrar, winzip
-	- .NET - terminal --> dornet --version
-	- MS Visual Studio (for .NET applications)
-	- Visual Studio Code
-	- Node.js
-	- Jenkins
-
 1. Resource Files
-	- open repo - https://github.com/SUContent/SEDO-Regular-Exam-2024-10/
+	- open repo - https://github.com/SUContent/SUContent-SEDO-Regular-Exam-2024-10-2/
 
 2. Working with Git and GitHub
 	- Fork the repo 	
@@ -67,10 +56,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Execute Unit Tests
-      run: dotnet test HouseRentingSystem.UnitTests/HouseRentingSystem.UnitTests.csproj --no-build --verbosity normal
+      run: dotnet test Homies.UnitTests/Homies.UnitTests.csproj --no-build --verbosity normal
 ------------------------------------------------------
-	- Commit to 'main' branch
-	- Set description as 'Added workflow for "develop branch" that triggers unit tests'
+	- Commit changes to 'main' branch
+	- Set description as 'Added workflow for "develop" branch that triggers unit tests'
 
 	- Merge from 'main' branch to 'develop' branch in forked repo !!! (the copy in your GitHub account)
 		- in Repo / Pull Request / Create pull request 
@@ -110,7 +99,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Execute Integration Tests
-      run: dotnet test HouseRentingSystem.Tests/HouseRentingSystem.Tests.csproj --no-build --verbosity normal
+      run: dotnet test Homes.IntegrationTests/Homes.IntegrationTests.csproj --no-build --verbosity normal
 ------------------------------------------------------
 	- Commit to 'main' branch
 	- Set description as 'Added workflow for "staging" branch that triggers integration tests'
@@ -122,7 +111,6 @@ jobs:
 			- click 'Commit changes' button
 			- click 'Merge pull request' / Confirm merge
 		- In Repo / Actions we can see that workflow with integration tests is running
-
 
 
 4. Create and Manage Branches
@@ -137,7 +125,7 @@ FORKED GitHub repo / Branches / New Branch
 Create Jenkinsfile
 Go to GitHb / Repo / Code
 	- go to 'feature-ci-pipeline' branch
-	- add new file name 'Jenkinsfile'
+	- add new file named 'Jenkinsfile'
 
 Jenkinsfile
 ------------------------------------------------------
@@ -168,7 +156,7 @@ Commit changes to 'feature-ci-pipeline' branch
 Start Jenkins and login
 	- Win Search / 'services'
 	- search for 'jenkins' and start the process
-	- open Jenkins on localhost:8080 and login
+	- open Jenkins on localhost:808 and login
 
 ----------------------------------
 Install MS Build Plugin in Jenkins
@@ -209,42 +197,51 @@ Create and test a new job in Jenkins
 ------------------------------------
 
 Dashboard / New Item 
-	- Enter an item name: Exam Prep 1
+	- Enter an item name: Exam Prep 2
 	- Pipeline
 	- OK
 	- Pipeline / Definition / Pipeline script from SCM
 		- SCM: Git
-			- Repository URL: https://github.com/entermix123/SEDO-Regular-Exam-2024-10/
+			- Repository URL: https://github.com/entermix123/SUContent-SEDO-Regular-Exam-2024-10-2
 			- Branches to build: */feature-ci-pipeline
 	- Save
 
-Dashboard / Exam Prep 1 / Build Now
+Dashboard / Exam Prep 2 / Build Now
+
+------------------------------------------------------
+Set Jenkins for scheduled check for Repository updates
+------------------------------------------------------
+Dahsboard / Job / Configure
+	- Poll SCM
+		- Schedule: * * * * *	# every minute or 'H/15 * * * *' for every 15 minutes
+	- Save
+
+After a minute the job will start. 
+	- We can see the result in Djashboard / Job / build number / Console Output 
+	- We can see the overview in Djashboard / Job / build number / Pipeline Overview
 
 In GitHub create and merge pull request from 'feature-ci-pipeline' branch to 'develop' branch with Jenkinsfile
-	
+
+
 
 6. Test and Merge
-In GitHub create and merge pull request from 'develop' branch to 'staging' branch
+In GitHub create and merge pull request from 'develop' branch to 'staging' branch in the FORKED repo (in your GitHub account)
 
 
 7. Create a Pull Request to Original Repository
 In GitHub create pull request 
 	from 
-	FORKED repo - https://github.com/entermix123/SEDO-Regular-Exam-2024-10 / staging branch 
+	FORKED repo - https://github.com/entermix123/SUContent-SEDO-Regular-Exam-2024-10-2 / staging branch 
 	to 
-	ORIGINAL repo - https://github.com/SUContent/SEDO-Regular-Exam-2024-10 / staging branch
+	ORIGINAL repo - https://github.com/SUContent/SUContent-SEDO-Regular-Exam-2024-10-2 / staging branch
 
 	- set Title: Staging changes from YordanB Exam Prep1
-	- set Description: YordanB - Final Pull Request for Exam Prep 1
+	- set Description: YordanB - Final Pull Request for Exam Prep 2
  
 8. Submission
 	- open word file with name 'Solution-Resources-Template-Software-Engineering-and-DevOps'		
-		 - GitHub URL: https://github.com/entermix123/SEDO-Regular-Exam-2024-10
+		 - GitHub URL: https://github.com/entermix123/SUContent-SEDO-Regular-Exam-2024-10-2
 	- zip the file
 	- upload the file to SoftUni system
-
-
-
-
 
 

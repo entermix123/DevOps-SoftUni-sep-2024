@@ -135,7 +135,7 @@ Expose local port to be used by GitHub using NGROK
 	- Login with GitHub / Register and install NGROK - https://dashboard.ngrok.com/get-started/setup/windows
 	- open the exe like administrator
 	- add your authtoken to the default ngrok.yml		
-		ngrok terminal --> ngrok config add-authtoken 2nkQoMDDMie6vRrdaLo0mxxxxxx_oYtQUw3Tw6Rzm3xxxxxx
+		ngrok terminal --> ngrok config add-authtoken <token>
 	- expose port 8080
 		ngrok terminal --> ngrok http http://localhost:8080
 
@@ -295,7 +295,7 @@ Login and generate authentication token from Docker Hub - https://hub.docker.com
 Go to Jenkins / Dashboard / Job / Configure / Build Steps / Add build Step / Execute Windows batch command
 	- field: 
 		docker build -t dockerhub_username/studentapp .
-		docker login -u dockerhub_username --password dckr_pat_xxxxxxxxxxxxxxxxxxxx
+		docker login -u dockerhub_username --password <token>
 		docker push dockerhub_username/studentapp
 	- Save
 	- Start the job
@@ -317,7 +317,7 @@ Jenkins / Job / Configure / Build Environment
 				- Jenkins
 					- Scope: Global (Jenkins, nodes, items, all child items, etc)
 					- username: dockerhub_username
-					- password: secret
+					- password: <docker_token>
 
 				- Add
 	- Save
@@ -484,7 +484,7 @@ Dashboard / Students CD / Configure
 Set job Students CD to run after job Students CI
 ------------------------------------------------
 
-Dashboard Students CI / Configure / Post-build Actions
+Dashboard / Students CI / Configure / Post-build Actions
 	- Build other projects: Students CD,
 		- select radio button 'Trigger only if build is stable'
 	- Build Triggers / uncheck 'GitHub hook trigger for GITScm polling' checkbox
