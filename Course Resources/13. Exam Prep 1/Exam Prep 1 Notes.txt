@@ -170,6 +170,7 @@ Start Jenkins and login
 	- search for 'jenkins' and start the process
 	- open Jenkins on localhost:8080 and login
 
+
 ----------------------------------
 Install MS Build Plugin in Jenkins
 ----------------------------------
@@ -239,12 +240,7 @@ In GitHub create pull request
  
 8. Submission
 	- open word file with name 'Solution-Resources-Template-Software-Engineering-and-DevOps'		
+
 		 - GitHub URL: https://github.com/entermix123/SEDO-Regular-Exam-2024-10
 	- zip the file
 	- upload the file to SoftUni system
-
-
-
-
-
-
