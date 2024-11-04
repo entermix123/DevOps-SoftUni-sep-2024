@@ -1,0 +1,194 @@
+
+
+Example GitHub Actions workflow with conditional deploy to render.com	
+---------------------------------------------------
+name: Build-Start-Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout the code                       
+      uses: actions/checkout@v4      
+    - name: Set Node.js                             
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20    
+    - name: install dependencies                     
+      run: npm install
+    - name: execute tests                            
+      run: npm test
+    - run: npm ci                                    
+    - run: npm run build --if-present                
+    - name: Execute integration tests			           
+      run: npm run test
+  
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    steps:
+      - name: Deploy to production
+        uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.MY_RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait_deploy: true 
+---------------------------------------------------
+
+
+Example GitHub Action workflow for BE & FE deploy to render.com
+---------------------------------------------------
+name: Build Test Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+  
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the code                        
+      uses: actions/checkout@v4      
+    - name: Set Node.js                              
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - name: install dependencies                     
+      run: npm install
+    - name: Update the config
+      run: echo "export const settings = {host:\"http://localhost:3030\"}" > src/config.js
+    - name: Install Playwright                   
+      run: npx playwright install
+    - name: Start Backend                   
+      run: npm run server &
+    - name: Start Frontend                    
+      run: npm run start &
+    - name: Start Tests                   
+      run: npm test
+
+  deploy_be:
+    runs-on: ubuntu-latest
+    needs: build_test
+    steps:
+      - name: Deploy to production
+        uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.MY_RENDER_SERVICE_BE_ID }}
+          api_key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait_deploy: true 
+
+  deploy_fe:
+    runs-on: ubuntu-latest
+    needs: build_test
+    steps:
+      - name: Deploy to production
+        uses: JorgeLNJunior/render-deploy@v1.4.3
+        with:
+          service_id: ${{ secrets.MY_RENDER_SERVICE_FE_ID }}
+          api_key: ${{ secrets.MY_RENDER_API_KEY }}
+          wait_deploy: true 
+---------------------------------------------------
+
+
+This is Jenkinsfile for single Job / Item
+---------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('Restore dependencies') {
+            steps {
+                bat 'dotnet restore'
+            }
+        }
+        stage('Dotnet Build') {
+            steps {
+                bat 'dotnet build --no-restore'
+            }
+        }
+        stage('Execute tests') {
+            steps {
+                bat 'dotnet test --no-build --verbosity normal'
+            }
+        }
+    }
+}
+---------------------------------------------------
+
+
+This is Jenkinsfile for Multibranch Job with branch conditions
+---------------------------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('Restore dependencies') {
+	    when {
+		branch 'branch_name'
+	    }
+            steps {
+                bat 'dotnet restore'
+            }
+        }
+        stage('Dotnet Build') {
+	    when {
+		branch 'branch_name'
+	    }
+            steps {
+                bat 'dotnet build --no-restore'
+            }
+        }
+        stage('Execute tests') {
+	    when {
+		branch 'branch_name'
+	    }
+            steps {
+                bat 'dotnet test --no-build --verbosity normal'
+            }
+        }
+    }
+}
+---------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
